@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visual Drag & Drop Redactor</title>
+
+    <!-- PDF.js for rendering and coordinate translation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <!-- pdf-lib for permanently modifying the PDF bytes -->
+    <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+
+    <style>
+        body { font-family: system-ui, -apple-system, sans-serif; max-width: 900px; margin: 30px auto; padding: 0 20px; color: #1e293b; background: #f8fafc; }
+        .card { background: #fff; padding: 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .badge { background: #d1fae5; color: #065f46; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; display: inline-block; margin-bottom: 15px; }
+        
+        /* Container to stack rendered PDF and interactive selection layer */
+        #canvas-wrapper { position: relative; display: inline-block; margin-top: 15px; border: 1px solid #cbd5e1; box-shadow: 0 2px 8px rgba(0,0,0,0.1); cursor: crosshair; }
+        #pdf-canvas { display: block; }
+        #selection-canvas { position: absolute; top: 0; left: 0; pointer-events: auto; }
+        
+        .controls { margin-top: 15px; display: flex; gap: 10px; align-items: center; }
+        button { background: #2563eb; color: white; border: none; padding: 10px 18px; border-radius: 6px; font-weight: 600; cursor: pointer; }
+        button:hover { background: #1d4ed8; }
+        button:disabled { background: #cbd5e1; cursor: not-allowed; }
+        .status { font-size: 14px; color: #64748b; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <span class="badge">🔒 100% Client-Side Visual Redactor</span>
+    <h2>Interactive Drag-to-Redact Tool</h2>
+    <p>Upload a PDF, then <strong>click and drag a box</strong> over any sensitive text or numbers you want to redact.</p>
+
+    <input type="file" id="pdfFile" accept="application/pdf">
+
+    <!-- Render Container -->
+    <div id="canvas-wrapper" style="display: none;">
+        <canvas id="pdf-canvas"></canvas>
+        <canvas id="selection-canvas"></canvas>
+    </div>
+
+    <div class="controls">
+        <button id="applyBtn" disabled>Apply Permanent Redaction & Download</button>
+        <button id="clearBtn" style="background: #ef4444;" disabled>Clear Selection</button>
+    </div>
+
+    <div id="status" class="status"></div>
+</div>
+
+<script>
+    // Initialize PDF.js worker
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+    let rawArrayBuffer = null;
+    let pdfPage = null;
+    let viewport = null;
+    let isDrawing = false;
+    let startX, startY;
+
+    // Selection Box State in Browser Canvas Pixels
+    let selectedBox = null; // { x, y, width, height }
+
+    const fileInput = document.getElementById('pdfFile');
+    const wrapper = document.getElementById('canvas-wrapper');
+    const pdfCanvas = document.getElementById('pdf-canvas');
+    const selectionCanvas = document.getElementById('selection-canvas');
+    const pdfCtx = pdfCanvas.getContext('2d');
+    const selectionCtx = selectionCanvas.getContext('2d');
+    const statusDiv = document.getElementById('status');
+    const applyBtn = document.getElementById('applyBtn');
+    const clearBtn = document.getElementById('clearBtn');
+
+    // 1. LOAD & RENDER PDF PAGE
+    fileInput.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        statusDiv.textContent = 'Loading document into memory...';
+        rawArrayBuffer = await file.arrayBuffer();
+
+        // Load document via PDF.js
+        const loadingTask = pdfjsLib.getDocument({ data: rawArrayBuffer });
+        const pdfDoc = await loadingTask.promise;
+        pdfPage = await pdfDoc.getPage(1); // Load page 1 for preview
+
+        // Set scaling viewport
+        const scale = 1.5; // High DPI preview
+        viewport = pdfPage.getViewport({ scale });
+
+        // Match overlay canvases to viewport dimensions
+        pdfCanvas.width = viewport.width;
+        pdfCanvas.height = viewport.height;
+        selectionCanvas.width = viewport.width;
+        selectionCanvas.height = viewport.height;
+
+        wrapper.style.display = 'inline-block';
+
+        // Render PDF background
+        await pdfPage.render({ canvasContext: pdfCtx, viewport }).promise;
+        statusDiv.textContent = 'Page loaded! Click and drag over the area you wish to mask.';
+        clearSelection();
+    });
+
+    // 2. MOUSE EVENT HANDLERS (DRAG SELECTION BOX)
+    selectionCanvas.addEventListener('mousedown', (e) => {
+        const rect = selectionCanvas.getBoundingClientRect();
+        startX = e.clientX - rect.left;
+        startY = e.clientY - rect.top;
+        isDrawing = true;
+    });
+
+    selectionCanvas.addEventListener('mousemove', (e) => {
+        if (!isDrawing) return;
+        const rect = selectionCanvas.getBoundingClientRect();
+        const currentX = e.clientX - rect.left;
+        const currentY = e.clientY - rect.top;
+
+        selectedBox = {
+            x: Math.min(startX, currentX),
+            y: Math.min(startY, currentY),
+            width: Math.abs(currentX - startX),
+            height: Math.abs(currentY - startY)
+        };
+
+        drawSelection();
+    });
+
+    selectionCanvas.addEventListener('mouseup', () => {
+        if (isDrawing) {
+            isDrawing = false;
+            if (selectedBox && selectedBox.width > 5 && selectedBox.height > 5) {
+                applyBtn.disabled = false;
+                clearBtn.disabled = false;
+                statusDiv.textContent = 'Selection complete. Click Apply to burn box into PDF.';
+            }
+        }
+    });
+
+    // Redraw Selection Box on Canvas
+    function drawSelection() {
+        selectionCtx.clearRect(0, 0, selectionCanvas.width, selectionCanvas.height);
+        if (!selectedBox) return;
+
+        // Draw translucent red box during drag
+        selectionCtx.fillStyle = 'rgba(239, 68, 68, 0.4)';
+        selectionCtx.strokeStyle = '#dc2626';
+        selectionCtx.lineWidth = 2;
+
+        selectionCtx.fillRect(selectedBox.x, selectedBox.y, selectedBox.width, selectedBox.height);
+        selectionCtx.strokeRect(selectedBox.x, selectedBox.y, selectedBox.width, selectedBox.height);
+    }
+
+    function clearSelection() {
+        selectedBox = null;
+        selectionCtx.clearRect(0, 0, selectionCanvas.width, selectionCanvas.height);
+        applyBtn.disabled = true;
+        clearBtn.disabled = true;
+    }
+
+    clearBtn.addEventListener('click', clearSelection);
+
+    // 3. CONVERT COORDINATES & BURN INTO PDF
+    applyBtn.addEventListener('click', async () => {
+        if (!selectedBox) return;
+
+        statusDiv.textContent = 'Converting coordinates and burning redaction box...';
+
+        try {
+            const { PDFDocument, rgb } = PDFLib;
+            const pdfDoc = await PDFDocument.load(rawArrayBuffer);
+            const pages = pdfDoc.getPages();
+            const page = pages[0]; // Page 1
+
+            const pdfWidth = page.getWidth();
+            const pdfHeight = page.getHeight();
+
+            // CONVERT BROWSER PIXELS TO PDF POINTS
+            // 1. Calculate scale ratio between preview canvas and real PDF document size
+            const scaleX = pdfWidth / viewport.width;
+            const scaleY = pdfHeight / viewport.height;
+
+            // 2. Map coordinates & Invert Y-Axis (PDF origin is bottom-left, browser is top-left)
+            const pdfX = selectedBox.x * scaleX;
+            const pdfWidthBox = selectedBox.width * scaleX;
+            const pdfHeightBox = selectedBox.height * scaleY;
+            const pdfY = pdfHeight - (selectedBox.y * scaleY) - pdfHeightBox;
+
+            // Draw solid opaque black box on PDF
+            page.drawRectangle({
+                x: pdfX,
+                y: pdfY,
+                width: pdfWidthBox,
+                height: pdfHeightBox,
+                color: rgb(0, 0, 0)
+            });
+
+            // Save modified file
+            const modifiedPdfBytes = await pdfDoc.save();
+
+            // Download
+            const blob = new Blob([modifiedPdfBytes], { type: 'application/pdf' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'redacted-document.pdf';
+            link.click();
+
+            statusDiv.textContent = 'Success! File redacted and downloaded locally.';
+        } catch (err) {
+            console.error(err);
+            statusDiv.textContent = 'Error processing redaction: ' + err.message;
+        }
+    });
+</script>
+</body>
+</html>

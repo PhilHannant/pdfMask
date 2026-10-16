@@ -1,125 +1,189 @@
-// Tab Switching Helper
-function switchTab(index) {
-    const panels = document.querySelectorAll('.panel');
-    const buttons = document.querySelectorAll('.tab-btn');
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+let rawArrayBuffer = null;
+let pdfPage = null;
+let viewport = null;
+let isDrawing = false;
+let startX, startY;
+let selectedBox = null;
+
+// --- NAVIGATION SWITCHING ---
+function switchTool(index) {
+    const panels = document.querySelectorAll('.tool-panel');
+    const buttons = document.querySelectorAll('.nav-btn');
     panels.forEach((p, i) => p.classList.toggle('active', i === index));
     buttons.forEach((b, i) => b.classList.toggle('active', i === index));
 }
 
-// Helper: Trigger browser download from binary bytes
-function downloadFile(bytes, filename) {
+// --- TOOL 1: DRAG & DROP REDACTOR LOGIC ---
+const fileInput = document.getElementById('pdfFile');
+const wrapper = document.getElementById('canvas-wrapper');
+const pdfCanvas = document.getElementById('pdf-canvas');
+const selectionCanvas = document.getElementById('selection-canvas');
+const pdfCtx = pdfCanvas.getContext('2d');
+const selectionCtx = selectionCanvas.getContext('2d');
+const statusDiv = document.getElementById('status');
+const applyBtn = document.getElementById('applyBtn');
+const clearBtn = document.getElementById('clearBtn');
+
+fileInput.addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    statusDiv.textContent = 'Loading document into memory...';
+    rawArrayBuffer = await file.arrayBuffer();
+
+    // Use .slice(0) to prevent buffer detachment issues across libraries
+    const loadingTask = pdfjsLib.getDocument({ data: rawArrayBuffer.slice(0) });
+    const pdfDoc = await loadingTask.promise;
+    pdfPage = await pdfDoc.getPage(1);
+
+    const scale = 1.5;
+    viewport = pdfPage.getViewport({ scale });
+
+    pdfCanvas.width = viewport.width;
+    pdfCanvas.height = viewport.height;
+    selectionCanvas.width = viewport.width;
+    selectionCanvas.height = viewport.height;
+
+    wrapper.style.display = 'inline-block';
+    await pdfPage.render({ canvasContext: pdfCtx, viewport }).promise;
+    statusDiv.textContent = 'Page loaded! Click and drag over the area you wish to mask.';
+    clearSelection();
+});
+
+selectionCanvas.addEventListener('mousedown', (e) => {
+    const rect = selectionCanvas.getBoundingClientRect();
+    startX = e.clientX - rect.left;
+    startY = e.clientY - rect.top;
+    isDrawing = true;
+});
+
+selectionCanvas.addEventListener('mousemove', (e) => {
+    if (!isDrawing) return;
+    const rect = selectionCanvas.getBoundingClientRect();
+    const currentX = e.clientX - rect.left;
+    const currentY = e.clientY - rect.top;
+
+    selectedBox = {
+        x: Math.min(startX, currentX),
+        y: Math.min(startY, currentY),
+        width: Math.abs(currentX - startX),
+        height: Math.abs(currentY - startY)
+    };
+
+    drawSelection();
+});
+
+selectionCanvas.addEventListener('mouseup', () => {
+    if (isDrawing) {
+        isDrawing = false;
+        if (selectedBox && selectedBox.width > 5 && selectedBox.height > 5) {
+            applyBtn.disabled = false;
+            clearBtn.disabled = false;
+            statusDiv.textContent = 'Selection complete. Click Apply to burn box into PDF.';
+        }
+    }
+});
+
+function drawSelection() {
+    selectionCtx.clearRect(0, 0, selectionCanvas.width, selectionCanvas.height);
+    if (!selectedBox) return;
+
+    selectionCtx.fillStyle = 'rgba(239, 68, 68, 0.4)';
+    selectionCtx.strokeStyle = '#dc2626';
+    selectionCtx.lineWidth = 2;
+    selectionCtx.fillRect(selectedBox.x, selectedBox.y, selectedBox.width, selectedBox.height);
+    selectionCtx.strokeRect(selectedBox.x, selectedBox.y, selectedBox.width, selectedBox.height);
+}
+
+function clearSelection() {
+    selectedBox = null;
+    selectionCtx.clearRect(0, 0, selectionCanvas.width, selectionCanvas.height);
+    applyBtn.disabled = true;
+    clearBtn.disabled = true;
+}
+
+clearBtn.addEventListener('click', clearSelection);
+
+applyBtn.addEventListener('click', async () => {
+    if (!selectedBox) return;
+    statusDiv.textContent = 'Burning redaction box securely in browser...';
+
+    try {
+        const { PDFDocument, rgb } = PDFLib;
+
+        // Pass a fresh Uint8Array slice to avoid detached buffer errors
+        const pdfDoc = await PDFDocument.load(new Uint8Array(rawArrayBuffer));
+        const page = pdfDoc.getPages()[0];
+
+        const pdfWidth = page.getWidth();
+        const pdfHeight = page.getHeight();
+
+        const scaleX = pdfWidth / viewport.width;
+        const scaleY = pdfHeight / viewport.height;
+
+        const pdfX = selectedBox.x * scaleX;
+        const pdfWidthBox = selectedBox.width * scaleX;
+        const pdfHeightBox = selectedBox.height * scaleY;
+        const pdfY = pdfHeight - ((selectedBox.y * scaleY) + pdfHeightBox);
+
+        page.drawRectangle({
+            x: pdfX,
+            y: pdfY,
+            width: pdfWidthBox,
+            height: pdfHeightBox,
+            color: rgb(0, 0, 0)
+        });
+
+        const modifiedPdfBytes = await pdfDoc.save();
+        triggerDownload(modifiedPdfBytes, 'redacted-document.pdf');
+        statusDiv.textContent = 'Success! File redacted offline and downloaded.';
+    } catch (err) {
+        statusDiv.textContent = 'Error: ' + err.message;
+        console.error(err);
+    }
+});
+
+// --- TOOL 2 & 3 LOGIC ---
+async function executeMerge() {
+    const input = document.getElementById('mergeFiles');
+    const status = document.getElementById('mergeStatus');
+    if (input.files.length < 2) { alert('Select at least 2 files.'); return; }
+    status.textContent = 'Merging locally...';
+    try {
+        const { PDFDocument } = PDFLib;
+        const merged = await PDFDocument.create();
+        for (const file of input.files) {
+            const buf = await file.arrayBuffer();
+            const pdf = await PDFDocument.load(new Uint8Array(buf));
+            const pages = await merged.copyPages(pdf, pdf.getPageIndices());
+            pages.forEach(p => merged.addPage(p));
+        }
+        triggerDownload(await merged.save(), 'merged-output.pdf');
+        status.textContent = 'Success!';
+    } catch(e) { status.textContent = 'Error: ' + e.message; }
+}
+
+async function executeUnlock() {
+    const input = document.getElementById('unlockFile');
+    const status = document.getElementById('unlockStatus');
+    if (!input.files.length) { alert('Select a file.'); return; }
+    status.textContent = 'Stripping restrictions locally...';
+    try {
+        const { PDFDocument } = PDFLib;
+        const buf = await input.files[0].arrayBuffer();
+        const pdf = await PDFDocument.load(new Uint8Array(buf));
+        if (typeof pdf.removeProtection === 'function') pdf.removeProtection();
+        triggerDownload(await pdf.save(), 'unlocked-output.pdf');
+        status.textContent = 'Success!';
+    } catch(e) { status.textContent = 'Error: ' + e.message; }
+}
+
+function triggerDownload(bytes, filename) {
     const blob = new Blob([bytes], { type: 'application/pdf' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
     link.download = filename;
     link.click();
-}
-
-// 1. CLIENT-SIDE MERGING
-async function mergePDFs() {
-    const fileInput = document.getElementById('mergeFiles');
-    const status = document.getElementById('mergeStatus');
-    if (fileInput.files.length < 2) {
-        alert('Please select at least 2 PDF files to merge.');
-        return;
-    }
-
-    status.textContent = 'Initializing local merger...';
-    try {
-        const { PDFDocument } = PDFLib;
-        const mergedPdf = await PDFDocument.create();
-
-        for (const file of fileInput.files) {
-            status.textContent = `Reading ${file.name}...`;
-            const arrayBuffer = await file.arrayBuffer();
-            const pdf = await PDFDocument.load(arrayBuffer);
-            const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
-            copiedPages.forEach((page) => mergedPdf.addPage(page));
-        }
-
-        status.textContent = 'Generating final merged PDF...';
-        const pdfBytes = await mergedPdf.save();
-        downloadFile(pdfBytes, 'merged-document.pdf');
-        status.textContent = 'Success! Merged entirely offline.';
-    } catch (err) {
-        status.textContent = 'Error: ' + err.message;
-    }
-}
-
-// 2. UNLOCK PERMISSIONS / REMOVE ENCRYPTION
-async function unlockPDF() {
-    const fileInput = document.getElementById('unlockFile');
-    const passwordInput = document.getElementById('ownerPassword').value;
-    const status = document.getElementById('unlockStatus');
-
-    if (fileInput.files.length === 0) {
-        alert('Please choose a PDF file.');
-        return;
-    }
-
-    status.textContent = 'Loading protected file into memory...';
-    try {
-        const file = fileInput.files[0];
-        const arrayBuffer = await file.arrayBuffer();
-        const { PDFDocument } = PDFLib;
-
-        // Load with credentials if provided
-        const loadOptions = passwordInput ? { credentials: passwordInput } : {};
-        const pdfDoc = await PDFDocument.load(arrayBuffer, loadOptions);
-
-        // Remove security restrictions/protection constraints
-        if (typeof pdfDoc.removeProtection === 'function') {
-            pdfDoc.removeProtection();
-        }
-
-        status.textContent = 'Unlocking and re-saving clean version...';
-        const pdfBytes = await pdfDoc.save();
-        downloadFile(pdfBytes, `unlocked-${file.name}`);
-        status.textContent = 'Success! Restrictions stripped locally.';
-    } catch (err) {
-        status.textContent = 'Error unlocking: Check password or file format. ' + err.message;
-    }
-}
-
-// 3. VISUAL REDACTION / BLACKOUT MASK
-async function redactPDF() {
-    const fileInput = document.getElementById('redactFile');
-    const status = document.getElementById('redactStatus');
-
-    if (!fileInput || fileInput.files.length === 0) {
-        alert('Please choose a PDF file to redact.');
-        return;
-    }
-
-    status.textContent = 'Loading document for redaction...';
-    try {
-        const file = fileInput.files[0];
-        const arrayBuffer = await file.arrayBuffer();
-        const { PDFDocument, rgb } = PDFLib;
-
-        // Use arrayBuffer.slice(0) to prevent detached ArrayBuffer errors
-        const pdfDoc = await PDFDocument.load(arrayBuffer.slice(0));
-        const pages = pdfDoc.getPages();
-
-        status.textContent = 'Applying black-box redaction masks across pages...';
-
-        // Draw an opaque black redaction box over a header zone on every page
-        for (const page of pages) {
-            const { width, height } = page.getSize();
-            page.drawRectangle({
-                x: 40,
-                y: height - 60,
-                width: width - 80,
-                height: 35,
-                color: rgb(0, 0, 0), // Solid black privacy block
-            });
-        }
-
-        const pdfBytes = await pdfDoc.save();
-        downloadFile(pdfBytes, `redacted-${file.name}`);
-        status.textContent = 'Success! Sensitive header bands masked locally.';
-    } catch (err) {
-        status.textContent = 'Error applying redaction: ' + err.message;
-        console.error(err);
-    }
 }

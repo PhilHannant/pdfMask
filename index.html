@@ -1,52 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Primary UK SEO Metadata -->
-    <title>Secure PDF Tools UK | 100% Private, Zero Server Uploads (UK GDPR Compliant)</title>
-    <meta name="description"
-          content="Free, privacy-first PDF utility suite for UK professionals. Merge, split, compress, and edit PDFs entirely in your browser. Zero file uploads, 100% UK GDPR compliant.">
-    <meta name="keywords"
-          content="private PDF tool UK, zero upload PDF merger, UK GDPR compliant PDF, client-side PDF utility, secure PDF editor solicitors accountants, offline PDF browser tool">
-    <meta name="drift" content="Drift">
-    <meta name="robots" content="index, follow">
-
-    <!-- Canonical URL (Replace with your actual domain) -->
-    <link rel="canonical" href="https://yourdomain.co.uk/">
-
-    <!-- Open Graph / LinkedIn & Social Preview Meta -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://pdfmask.co.uk/">
-    <meta property="og:title" content="Secure UK PDF Tools — 100% On-Device & UK GDPR Compliant">
-    <meta property="og:description"
-          content="Process confidential client files with zero server uploads. Fast, free, browser-based PDF tools built for UK legal and finance teams.">
-    <meta property="og:image" content="https://pdfmask.co.uk/assets/og-preview.png">
-    <meta property="og:locale" content="en_GB">
-
-    <!-- Twitter Card Metadata -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:url" content="https://pdfmask.co.uk/">
-    <meta name="twitter:title" content="Secure UK PDF Tools | Zero Server Uploads">
-    <meta name="twitter:description"
-          content="Merge, split, and edit PDFs entirely client-side. Guaranteed UK GDPR compliance for sensitive documents.">
-    <meta name="twitter:image" content="https://pdfmask.co.uk/assets/og-preview.png">
-
-    <!-- Structured Data (Schema.org JSON-LD for Google App Snippets) -->
-    <script type="application/ld+json">
-        {
-            "@context": "https://schema.org",
-            "@type": "WebApplication",
-            "name": "Secure PDF Utility Suite UK",
-            "url": "https://yourdomain.co.uk/",
-            "applicationCategory": "BusinessApplication",
-            "operatingSystem": "All (Web Browser)",
-            "offers": {
-                "@type": "Offer",
-                "price": "0",
-                "priceCurrency": "GBP"
-            },
-            "description": "Browser-based, zero-server-upload PDF management tool strictly compliant with UK GDPR regulations."
-        }
-    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SecureLocal PDF Studio</title>
 
     <!-- PDF.js for rendering and coordinate translation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
@@ -84,7 +42,7 @@
             position: sticky;
             top: 0;
             z-index: 100;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
         }
 
         .nav-brand {
@@ -142,16 +100,11 @@
             background: var(--card-bg);
             padding: 30px;
             border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
         }
 
-        .tool-panel {
-            display: none;
-        }
-
-        .tool-panel.active {
-            display: block;
-        }
+        .tool-panel { display: none; }
+        .tool-panel.active { display: block; }
 
         /* Canvas Wrapper for Redaction Tool */
         #canvas-wrapper {
@@ -159,32 +112,15 @@
             display: inline-block;
             margin-top: 15px;
             border: 1px solid var(--border);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             cursor: crosshair;
             max-width: 100%;
             overflow: auto;
         }
+        #pdf-canvas { display: block; max-width: 100%; height: auto; }
+        #selection-canvas { position: absolute; top: 0; left: 0; pointer-events: auto; }
 
-        #pdf-canvas {
-            display: block;
-            max-width: 100%;
-            height: auto;
-        }
-
-        #selection-canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            pointer-events: auto;
-        }
-
-        .controls {
-            margin-top: 15px;
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
+        .controls { margin-top: 15px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 
         button.action-btn {
             background: var(--primary);
@@ -195,27 +131,11 @@
             font-weight: 600;
             cursor: pointer;
         }
+        button.action-btn:hover { background: var(--primary-hover); }
+        button.action-btn:disabled { background: var(--border); cursor: not-allowed; }
 
-        button.action-btn:hover {
-            background: var(--primary-hover);
-        }
-
-        button.action-btn:disabled {
-            background: var(--border);
-            cursor: not-allowed;
-        }
-
-        .status {
-            font-size: 14px;
-            color: var(--text-muted);
-            margin-top: 12px;
-            font-weight: 500;
-        }
-
-        input[type="file"] {
-            margin: 15px 0;
-            display: block;
-        }
+        .status { font-size: 14px; color: var(--text-muted); margin-top: 12px; font-weight: 500; }
+        input[type="file"] { margin: 15px 0; display: block; }
     </style>
 </head>
 <body>
@@ -244,8 +164,7 @@
         <!-- TOOL 1: VISUAL DRAG-AND-DROP REDACTOR -->
         <div id="panel-0" class="tool-panel active">
             <h2>Interactive Drag-to-Redact Tool</h2>
-            <p>Select a PDF file, then <strong>click and drag a box</strong> over sensitive text or numbers you want to
-                permanently mask offline.</p>
+            <p>Select a PDF file, then <strong>click and drag a box</strong> over sensitive text or numbers you want to permanently mask offline.</p>
 
             <input type="file" id="pdfFile" accept="application/pdf">
 
@@ -265,8 +184,7 @@
         <!-- TOOL 2: MERGE SUITE -->
         <div id="panel-1" class="tool-panel">
             <h2>Client-Side PDF Merger</h2>
-            <p>Combine multiple local PDF files sequentially into a single file without transferring data over the
-                internet.</p>
+            <p>Combine multiple local PDF files sequentially into a single file without transferring data over the internet.</p>
             <input type="file" id="mergeFiles" accept="application/pdf" multiple>
             <button class="action-btn" onclick="executeMerge()">Merge and Download</button>
             <div id="mergeStatus" class="status"></div>
@@ -321,12 +239,12 @@
         statusDiv.textContent = 'Loading document into memory...';
         rawArrayBuffer = await file.arrayBuffer();
 
-        const loadingTask = pdfjsLib.getDocument({data: rawArrayBuffer});
+        const loadingTask = pdfjsLib.getDocument({ data: rawArrayBuffer });
         const pdfDoc = await loadingTask.promise;
         pdfPage = await pdfDoc.getPage(1);
 
         const scale = 1.5;
-        viewport = pdfPage.getViewport({scale});
+        viewport = pdfPage.getViewport({ scale });
 
         pdfCanvas.width = viewport.width;
         pdfCanvas.height = viewport.height;
@@ -334,7 +252,7 @@
         selectionCanvas.height = viewport.height;
 
         wrapper.style.display = 'inline-block';
-        await pdfPage.render({canvasContext: pdfCtx, viewport}).promise;
+        await pdfPage.render({ canvasContext: pdfCtx, viewport }).promise;
         statusDiv.textContent = 'Page loaded! Click and drag over the area you wish to mask.';
         clearSelection();
     });
@@ -398,7 +316,7 @@
         statusDiv.textContent = 'Burning redaction box securely in browser...';
 
         try {
-            const {PDFDocument, rgb} = PDFLib;
+            const { PDFDocument, rgb } = PDFLib;
             const pdfDoc = await PDFDocument.load(rawArrayBuffer);
             const page = pdfDoc.getPages()[0];
 
@@ -433,13 +351,10 @@
     async function executeMerge() {
         const input = document.getElementById('mergeFiles');
         const status = document.getElementById('mergeStatus');
-        if (input.files.length < 2) {
-            alert('Select at least 2 files.');
-            return;
-        }
+        if (input.files.length < 2) { alert('Select at least 2 files.'); return; }
         status.textContent = 'Merging locally...';
         try {
-            const {PDFDocument} = PDFLib;
+            const { PDFDocument } = PDFLib;
             const merged = await PDFDocument.create();
             for (const file of input.files) {
                 const buf = await file.arrayBuffer();
@@ -449,33 +364,26 @@
             }
             triggerDownload(await merged.save(), 'merged-output.pdf');
             status.textContent = 'Success!';
-        } catch (e) {
-            status.textContent = 'Error: ' + e.message;
-        }
+        } catch(e) { status.textContent = 'Error: ' + e.message; }
     }
 
     async function executeUnlock() {
         const input = document.getElementById('unlockFile');
         const status = document.getElementById('unlockStatus');
-        if (!input.files.length) {
-            alert('Select a file.');
-            return;
-        }
+        if (!input.files.length) { alert('Select a file.'); return; }
         status.textContent = 'Stripping restrictions locally...';
         try {
-            const {PDFDocument} = PDFLib;
+            const { PDFDocument } = PDFLib;
             const buf = await input.files[0].arrayBuffer();
             const pdf = await PDFDocument.load(buf);
             if (typeof pdf.removeProtection === 'function') pdf.removeProtection();
             triggerDownload(await pdf.save(), 'unlocked-output.pdf');
             status.textContent = 'Success!';
-        } catch (e) {
-            status.textContent = 'Error: ' + e.message;
-        }
+        } catch(e) { status.textContent = 'Error: ' + e.message; }
     }
 
     function triggerDownload(bytes, filename) {
-        const blob = new Blob([bytes], {type: 'application/pdf'});
+        const blob = new Blob([bytes], { type: 'application/pdf' });
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
         link.download = filename;

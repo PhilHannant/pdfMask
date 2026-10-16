@@ -86,7 +86,7 @@ async function redactPDF() {
     const fileInput = document.getElementById('redactFile');
     const status = document.getElementById('redactStatus');
 
-    if (fileInput.files.length === 0) {
+    if (!fileInput || fileInput.files.length === 0) {
         alert('Please choose a PDF file to redact.');
         return;
     }
@@ -97,11 +97,13 @@ async function redactPDF() {
         const arrayBuffer = await file.arrayBuffer();
         const { PDFDocument, rgb } = PDFLib;
 
-        const pdfDoc = await PDFDocument.load(arrayBuffer);
+        // Use arrayBuffer.slice(0) to prevent detached ArrayBuffer errors
+        const pdfDoc = await PDFDocument.load(arrayBuffer.slice(0));
         const pages = pdfDoc.getPages();
 
         status.textContent = 'Applying black-box redaction masks across pages...';
-        // Example: Draw an opaque black redaction box over a header zone on every page
+
+        // Draw an opaque black redaction box over a header zone on every page
         for (const page of pages) {
             const { width, height } = page.getSize();
             page.drawRectangle({
@@ -118,5 +120,6 @@ async function redactPDF() {
         status.textContent = 'Success! Sensitive header bands masked locally.';
     } catch (err) {
         status.textContent = 'Error applying redaction: ' + err.message;
+        console.error(err);
     }
 }

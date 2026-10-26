@@ -1,0 +1,12 @@
+# Files in the repo that should not be served on the website.
+.git
+.github
+.gitignore
+.assetsignore
+node_modules
+tests
+package.json
+package-lock.json
+wrangler.jsonc
+README.md
+app.js

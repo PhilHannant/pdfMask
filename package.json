@@ -1,0 +1,14 @@
+{
+  "name": "pdfmask",
+  "private": true,
+  "description": "Private, browser-only PDF tools",
+  "scripts": {
+    "build": "esbuild app.js --minify --target=es2019 --outfile=app.min.js",
+    "test": "node --test \"tests/*.test.js\""
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2",
+    "pdf-lib": "1.17.1",
+    "playwright": "^1.63.0"
+  }
+}

@@ -4,7 +4,7 @@ Private PDF tools (redact, merge, unlock) that run entirely in the browser. File
 
 ## Development
 
-`app.js` is the source; the site loads the minified `app.min.js`. After editing `app.js`:
+`app.js` is the source; the site loads the minified `app.min.js`, which Cloudflare builds on every deploy. To build it locally (for example to preview the site):
 
 ```sh
 npm install
@@ -22,8 +22,13 @@ The redaction test builds a PDF with secrets hidden in page text, a form field, 
 
 Tests load pdf.js and pdf-lib from the same CDNs as the live site. To run offline, set `PDFMASK_LOCAL_LIBS` to a folder containing `pdf.min.js`, `pdf.worker.min.js` and `pdf-lib.min.js`.
 
-GitHub Actions runs the tests on every push and pull request, and checks that `app.min.js` was rebuilt after changes to `app.js`.
+GitHub Actions builds `app.min.js` from `app.js` and runs the tests on every push and pull request.
 
 ## Deployment
 
-Deployed as a Cloudflare Worker serving static assets (`wrangler.jsonc`). `.assetsignore` keeps tests, source and config files off the live site.
+Deployed with Cloudflare Workers Builds as a Worker serving static assets (`wrangler.jsonc`):
+
+- Build command: `npm install && npm run build`
+- Deploy command: `npx wrangler deploy`
+
+`.assetsignore` keeps tests, source and config files off the live site.

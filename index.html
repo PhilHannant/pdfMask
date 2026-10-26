@@ -49,7 +49,7 @@
                 "inLanguage": "en-GB",
                 "isAccessibleForFree": true,
                 "featureList": [
-                    "Black out sensitive areas of a PDF",
+                    "Permanently redact sensitive areas of a PDF",
                     "Merge multiple PDFs into one file",
                     "Remove PDF editing, copying and printing restrictions",
                     "All processing happens on your device with no file uploads"
@@ -63,6 +63,11 @@
                         "@type": "Question",
                         "name": "Are my PDF files uploaded to a server?",
                         "acceptedAnswer": { "@type": "Answer", "text": "No. pdfMask runs entirely in your web browser. Your PDFs are read and processed in your device's memory and are never sent to our servers or anyone else's." }
+                    },
+                    {
+                        "@type": "Question",
+                        "name": "Is the redaction permanent, or just a black box on top?",
+                        "acceptedAnswer": { "@type": "Answer", "text": "It's permanent. Simply drawing a black box over a PDF leaves the text underneath in the file, where anyone can copy it. pdfMask instead rebuilds every page you redact as a flat image with the marked areas blacked out, so the hidden text, images and data are removed from the file entirely. Pages you don't redact are kept exactly as they were." }
                     },
                     {
                         "@type": "Question",
@@ -221,8 +226,23 @@
             max-width: 100%;
             overflow: auto;
         }
-        #pdf-canvas { display: block; max-width: 100%; height: auto; }
-        #selection-canvas { position: absolute; top: 0; left: 0; pointer-events: auto; }
+        #pdf-canvas { display: block; }
+        #selection-canvas { position: absolute; top: 0; left: 0; pointer-events: auto; touch-action: none; }
+
+        .page-nav { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 4px; }
+        .page-info { font-size: 14px; color: var(--text-muted); font-weight: 500; }
+
+        button.secondary-btn {
+            background: #ffffff;
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            padding: 9px 16px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        button.secondary-btn:hover { background: #f1f5f9; }
+        button.secondary-btn:disabled { color: var(--border); background: #ffffff; cursor: not-allowed; }
 
         .controls { margin-top: 15px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 
@@ -339,9 +359,15 @@
             <!-- TOOL 1: VISUAL DRAG-AND-DROP REDACTOR -->
             <div id="panel-0" class="tool-panel active">
                 <h2>Redact a PDF</h2>
-                <p>Choose a PDF, then <strong>click and drag a box</strong> over the text or numbers you want to black out.</p>
+                <p>Choose a PDF, then <strong>click and drag</strong> over any text, numbers or images you want to remove. Mark as many areas as you need, on as many pages as you need.</p>
 
                 <input type="file" id="pdfFile" accept="application/pdf" aria-label="Choose a PDF to redact">
+
+                <div id="page-nav" class="page-nav" style="display: none;">
+                    <button id="prevPage" class="secondary-btn" disabled aria-label="Previous page">‹ Prev</button>
+                    <span id="pageInfo" class="page-info" aria-live="polite"></span>
+                    <button id="nextPage" class="secondary-btn" disabled aria-label="Next page">Next ›</button>
+                </div>
 
                 <div id="canvas-wrapper" style="display: none;">
                     <canvas id="pdf-canvas"></canvas>
@@ -349,8 +375,9 @@
                 </div>
 
                 <div class="controls">
-                    <button id="applyBtn" class="action-btn" disabled>Apply Redaction & Download</button>
-                    <button id="clearBtn" class="action-btn" style="background: #ef4444;" disabled>Clear Selection</button>
+                    <button id="applyBtn" class="action-btn" disabled>Apply Permanent Redaction & Download</button>
+                    <button id="undoBtn" class="secondary-btn" disabled>Undo</button>
+                    <button id="clearBtn" class="secondary-btn" disabled>Clear Page</button>
                 </div>
 
                 <div id="status" class="status" role="status"></div>
@@ -390,7 +417,7 @@
             <div class="grid">
                 <div class="tile">
                     <h3>Redact PDF</h3>
-                    <p>Draw a box over names, account numbers, addresses or any other sensitive detail to black it out before sharing.</p>
+                    <p>Draw a box over names, account numbers, addresses or any other sensitive detail to remove it permanently before sharing.</p>
                 </div>
                 <div class="tile">
                     <h3>Merge PDFs</h3>
@@ -422,6 +449,10 @@
             <details>
                 <summary>Are my PDF files uploaded to a server?</summary>
                 <p>No. pdfMask runs entirely in your web browser. Your PDFs are read and processed in your device's memory and are never sent to our servers or anyone else's.</p>
+            </details>
+            <details>
+                <summary>Is the redaction permanent, or just a black box on top?</summary>
+                <p>It's permanent. Simply drawing a black box over a PDF leaves the text underneath in the file, where anyone can copy it. pdfMask instead rebuilds every page you redact as a flat image with the marked areas blacked out, so the hidden text, images and data are removed from the file entirely. Pages you don't redact are kept exactly as they were.</p>
             </details>
             <details>
                 <summary>Is pdfMask free?</summary>

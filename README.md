@@ -1,6 +1,12 @@
 # pdfMask
 
-Private PDF tools (redact, merge, unlock) that run entirely in the browser. Files are never uploaded.
+**[pdfmask.co.uk](https://pdfmask.co.uk)**: free, private PDF tools that run entirely in your browser. Files are never uploaded.
+
+- **[Redact PDF](https://pdfmask.co.uk):** permanently remove sensitive text, numbers and images
+- **[Merge PDFs](https://pdfmask.co.uk):** combine several PDFs into one file
+- **[Unlock PDF](https://pdfmask.co.uk):** remove editing, copying and printing restrictions
+
+Built for UK legal, finance and HR teams handling confidential client documents.
 
 ## Development
 

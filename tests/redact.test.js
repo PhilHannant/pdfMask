@@ -81,7 +81,9 @@ async function buildFixture() {
 }
 
 async function openRedactor(file) {
-    const context = await browser.newContext({ viewport: { width: 1280, height: 1000 }, acceptDownloads: true });
+    // Tall enough that every box we draw is on screen whatever fonts the
+    // machine has: mouse events outside the window are never delivered.
+    const context = await browser.newContext({ viewport: { width: 1280, height: 1800 }, acceptDownloads: true });
     await routeLocalLibs(context);
     const page = await context.newPage();
     const errors = [];
@@ -93,6 +95,8 @@ async function openRedactor(file) {
 
 async function drawBox(page, b) {
     const r = await page.locator('#selection-canvas').boundingBox();
+    const viewport = page.viewportSize();
+    assert.ok(r.y + b.y1 * r.height < viewport.height, 'box would be drawn off-screen; make the test window taller');
     await page.mouse.move(r.x + b.x0 * r.width, r.y + b.y0 * r.height);
     await page.mouse.down();
     await page.mouse.move(r.x + b.x1 * r.width, r.y + b.y1 * r.height, { steps: 5 });

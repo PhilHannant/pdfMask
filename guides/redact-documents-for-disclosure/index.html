@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Redacting PDFs for Disclosure: A Practical Checklist | pdfMask</title>
+    <meta name="description"
+          content="A practical checklist for redacting PDFs for disclosure, tribunals and court bundles: working on copies, consistency, hidden content and final checks.">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <meta name="theme-color" content="#2563eb">
+    <link rel="canonical" href="https://pdfmask.co.uk/guides/redact-documents-for-disclosure/">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
+    <link rel="stylesheet" href="/assets/site.css">
+
+    <meta property="og:type" content="article">
+    <meta property="og:site_name" content="pdfMask">
+    <meta property="og:url" content="https://pdfmask.co.uk/guides/redact-documents-for-disclosure/">
+    <meta property="og:title" content="Redacting PDFs for Disclosure: A Practical Checklist">
+    <meta property="og:description" content="How to redact disclosure documents so the redactions hold up, from consistency to hidden content to final checks.">
+    <meta property="og:image" content="https://pdfmask.co.uk/assets/og-preview.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="pdfMask – private PDF tools that run in your browser">
+    <meta property="og:locale" content="en_GB">
+    <meta name="twitter:card" content="summary_large_image">
+
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@graph": [
+            {
+                "@type": "Article",
+                "headline": "Redacting PDFs for disclosure: a practical checklist",
+                "description": "A practical checklist for redacting PDFs for disclosure, tribunals and court bundles.",
+                "url": "https://pdfmask.co.uk/guides/redact-documents-for-disclosure/",
+                "mainEntityOfPage": "https://pdfmask.co.uk/guides/redact-documents-for-disclosure/",
+                "datePublished": "2026-11-07",
+                "dateModified": "2026-11-07",
+                "inLanguage": "en-GB",
+                "image": "https://pdfmask.co.uk/assets/og-preview.png",
+                "author": { "@type": "Organization", "name": "pdfMask", "url": "https://pdfmask.co.uk/" },
+                "publisher": { "@type": "Organization", "name": "pdfMask", "url": "https://pdfmask.co.uk/" }
+            },
+            {
+                "@type": "BreadcrumbList",
+                "itemListElement": [
+                    { "@type": "ListItem", "position": 1, "name": "pdfMask", "item": "https://pdfmask.co.uk/" },
+                    { "@type": "ListItem", "position": 2, "name": "Guides", "item": "https://pdfmask.co.uk/guides/" },
+                    { "@type": "ListItem", "position": 3, "name": "Redacting for disclosure", "item": "https://pdfmask.co.uk/guides/redact-documents-for-disclosure/" }
+                ]
+            }
+        ]
+    }
+    </script>
+</head>
+<body>
+
+<header class="navbar">
+    <a class="nav-brand" href="/">🛡️ pdfMask</a>
+    <nav class="nav-links" aria-label="Main">
+        <a class="nav-link" href="/redact-pdf/">Redact PDF</a>
+        <a class="nav-link" href="/merge-pdf/">Merge PDFs</a>
+        <a class="nav-link" href="/redaction-checker/">Redaction checker</a>
+        <a class="nav-link" href="/guides/">Guides</a>
+    </nav>
+    <span class="nav-badge">🔒 Zero Server Uploads</span>
+</header>
+
+<main class="wrap">
+
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+        <ol>
+            <li><a href="/">pdfMask</a></li>
+            <li><a href="/guides/">Guides</a></li>
+            <li aria-current="page">Redacting for disclosure</li>
+        </ol>
+    </nav>
+
+    <article class="content prose">
+        <div class="hero">
+            <h1>Redacting PDFs for disclosure: a practical checklist</h1>
+            <p>In litigation, employment tribunals and regulatory matters, documents are often produced with parts redacted. A redaction that can be undone, or that's applied inconsistently, can cause far more trouble than the information it was meant to protect. This checklist covers doing it so it holds up.</p>
+        </div>
+
+        <div class="callout">
+            <p><strong>This is a technical checklist, not legal advice.</strong> Whether and what you can redact depends on the rules and any directions that apply to your matter, and redactions may need to be explained. It doesn't cover those decisions.</p>
+        </div>
+
+        <section>
+            <h2>1. Set up before you redact</h2>
+            <ul>
+                <li><strong>Keep an unredacted master set</strong> and only ever redact copies.</li>
+                <li><strong>Keep a redaction log</strong> recording each document, page, what was redacted and the reason, so redactions can be explained and reviewed.</li>
+                <li><strong>Decide your approach to duplicates and email chains</strong> up front, so the same information is treated the same way wherever it appears.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>2. Watch for content you can't see</h2>
+            <p>Before redacting, look at what's in the PDF beyond the visible page:</p>
+            <ul>
+                <li><strong>Converted Word and Excel files</strong> can carry tracked changes, comments or hidden rows and columns into the PDF if they were printed that way. Check the PDF itself, not just the original.</li>
+                <li><strong>Scanned documents</strong> with searchable text have an invisible text layer. Redacting the image without removing that layer leaves the words in the file.</li>
+                <li><strong>Document properties</strong> such as title and author, plus comments and attachments, travel with the file.</li>
+            </ul>
+            <p>The <a href="/redaction-checker/">redaction checker</a> flags hidden text, document properties, attachments and comments, and works just as well on a file before you redact it.</p>
+        </section>
+
+        <section>
+            <h2>3. Apply redactions that can't be undone</h2>
+            <p>Drawing shapes over text, highlighting in black or covering with white boxes only hides content on screen. The text underneath can be copied out, and in some software the shapes can simply be moved.</p>
+            <p><a href="/redact-pdf/">pdfMask's redactor</a> rebuilds every page you redact as a flat image with the marked areas painted solid black, so the underlying text, fonts and form values are removed from the file. Your documents are processed on your own device, so client material isn't uploaded to a third-party service.</p>
+            <ul>
+                <li><strong>Page count and order are preserved,</strong> so page references and numbering in your bundle still line up.</li>
+                <li><strong>Unredacted pages are left exactly as they were,</strong> with their text intact.</li>
+                <li><strong>Redactions are plain black boxes.</strong> If your matter calls for redactions to be labelled with a reason, such as "Privileged", you'll need to add those labels separately.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>4. Check every redacted document</h2>
+            <ul>
+                <li>Run each file through the <a href="/redaction-checker/">redaction checker</a>.</li>
+                <li>Do a manual copy-and-paste test across a few redacted areas.</li>
+                <li>Check headers, footers, page numbers, file names and email subject lines for anything you've redacted from the body.</li>
+                <li>Have someone else review a sample against the redaction log.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>5. Assemble the bundle</h2>
+            <p>Once each document is redacted and checked, you can <a href="/merge-pdf/">merge them into a single PDF</a> in the order you need. Redact first, then merge, so each document can be checked on its own.</p>
+            <p>Bear in mind that redacted pages become images, so their text can't be searched. If the recipient expects fully searchable documents, factor that in.</p>
+        </section>
+
+        <section>
+            <h2>Related</h2>
+            <ul>
+                <li><a href="/guides/subject-access-request-redaction/">Redacting documents for a subject access request</a></li>
+                <li><a href="/redaction-checker/">How to check a redacted PDF for hidden text</a></li>
+            </ul>
+        </section>
+
+        <p class="note">This guide is general information about redacting PDF documents. It isn't legal advice. Published 7 November 2026.</p>
+    </article>
+</main>
+
+<footer class="site-footer">
+    <nav class="footer-links" aria-label="Footer">
+        <a href="/redact-pdf/">Redact PDF</a>
+        <a href="/merge-pdf/">Merge PDFs</a>
+        <a href="/redaction-checker/">Redaction checker</a>
+        <a href="/guides/">Guides</a>
+    </nav>
+    <p>© 2026 pdfMask · Private PDF tools that run in your browser · Made in the UK</p>
+    <p>Guides on this site are general information, not legal advice.</p>
+</footer>
+
+</body>
+</html>

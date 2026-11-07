@@ -12,6 +12,7 @@ const ROOT = path.resolve(__dirname, '..');
 const MIME = {
     '.html': 'text/html; charset=utf-8',
     '.js': 'text/javascript',
+    '.css': 'text/css',
     '.png': 'image/png',
     '.xml': 'application/xml',
     '.txt': 'text/plain',
@@ -21,10 +22,12 @@ const MIME = {
 function startServer() {
     const server = http.createServer((req, res) => {
         const urlPath = decodeURIComponent(new URL(req.url, 'http://x').pathname);
-        const file = path.join(ROOT, urlPath === '/' ? 'index.html' : urlPath);
+        // Same rules as Cloudflare's static assets: /page/ serves page/index.html.
+        let file = path.join(ROOT, urlPath);
+        if (urlPath.endsWith('/')) file = path.join(file, 'index.html');
         if (!file.startsWith(ROOT) || !fs.existsSync(file) || fs.statSync(file).isDirectory()) {
-            res.writeHead(404);
-            res.end();
+            res.writeHead(404, { 'Content-Type': MIME['.html'] });
+            fs.createReadStream(path.join(ROOT, '404.html')).on('error', () => res.end()).pipe(res);
             return;
         }
         res.writeHead(200, { 'Content-Type': MIME[path.extname(file)] || 'application/octet-stream' });

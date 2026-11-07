@@ -86,7 +86,7 @@ async function openRedactor(file) {
     const page = await context.newPage();
     const errors = [];
     page.on('pageerror', e => errors.push(e.message));
-    await page.goto(baseUrl, { waitUntil: 'networkidle' });
+    await page.goto(baseUrl + 'redact-pdf/', { waitUntil: 'networkidle' });
     await page.setInputFiles('#pdfFile', file);
     return { page, context, errors };
 }
@@ -194,6 +194,15 @@ test('redacted content is removed from the file, everything else survives', asyn
         return dark;
     }, Array.from(output));
     assert.ok(headingInk > 50, 'heading outside the boxes should still be visible');
+
+    // 4. pdfMask's own redaction checker finds nothing wrong with the result.
+    const outFile = path.join(tmp, 'client-file-redacted.pdf');
+    fs.writeFileSync(outFile, output);
+    await page.goto(baseUrl + 'redaction-checker/', { waitUntil: 'networkidle' });
+    await page.setInputFiles('#checkFile', outFile);
+    await page.waitForSelector('#checkResults .verdict', { timeout: 30000 });
+    assert.match(await page.getAttribute('#checkResults .verdict', 'class'), /\bok\b/,
+        await page.textContent('#checkResults'));
 
     assert.deepEqual(errors, []);
     await context.close();

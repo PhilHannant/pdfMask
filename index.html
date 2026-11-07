@@ -4,57 +4,45 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Redact PDF Online Free – No Uploads | pdfMask</title>
+    <title>Private PDF Tools: Redact, Merge &amp; Check PDFs | pdfMask</title>
     <meta name="description"
-          content="Black out sensitive text, merge PDFs and remove restrictions free in your browser. Files never leave your device. Built for UK legal and finance teams.">
+          content="Free PDF tools that run entirely in your browser: permanently redact PDFs, merge files and check redactions for hidden text. Files never leave your device.">
     <meta name="robots" content="index, follow, max-image-preview:large">
     <meta name="theme-color" content="#2563eb">
     <link rel="canonical" href="https://pdfmask.co.uk/">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
+    <link rel="stylesheet" href="/assets/site.css">
 
-    <!-- Open Graph -->
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="pdfMask">
     <meta property="og:url" content="https://pdfmask.co.uk/">
-    <meta property="og:title" content="pdfMask – Redact, Merge and Unlock PDFs Without Uploading">
-    <meta property="og:description"
-          content="Free PDF tools that run entirely in your browser. Confidential client files never touch a server.">
+    <meta property="og:title" content="pdfMask – Private PDF Tools That Never Upload Your Files">
+    <meta property="og:description" content="Permanently redact, merge and check PDFs entirely in your browser. Confidential files never touch a server.">
     <meta property="og:image" content="https://pdfmask.co.uk/assets/og-preview.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta property="og:image:alt" content="pdfMask – private PDF tools that run in your browser">
     <meta property="og:locale" content="en_GB">
-
-    <!-- Twitter / X -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="pdfMask – Redact, Merge and Unlock PDFs Without Uploading">
-    <meta name="twitter:description"
-          content="Free PDF tools that run entirely in your browser. Your files never leave your device.">
-    <meta name="twitter:image" content="https://pdfmask.co.uk/assets/og-preview.png">
 
-    <!-- Structured data -->
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
         "@graph": [
             {
-                "@type": "WebApplication",
-                "@id": "https://pdfmask.co.uk/#app",
+                "@type": "WebSite",
+                "@id": "https://pdfmask.co.uk/#website",
                 "name": "pdfMask",
                 "url": "https://pdfmask.co.uk/",
-                "description": "Free browser-based PDF tools that black out sensitive content, merge PDFs and remove PDF restrictions without uploading files to a server.",
-                "applicationCategory": "BusinessApplication",
-                "operatingSystem": "Any (web browser)",
-                "browserRequirements": "Requires JavaScript",
                 "inLanguage": "en-GB",
-                "isAccessibleForFree": true,
-                "featureList": [
-                    "Permanently redact sensitive areas of a PDF",
-                    "Merge multiple PDFs into one file",
-                    "Remove PDF editing, copying and printing restrictions",
-                    "All processing happens on your device with no file uploads"
-                ],
-                "offers": { "@type": "Offer", "price": "0", "priceCurrency": "GBP" }
+                "publisher": { "@id": "https://pdfmask.co.uk/#org" }
+            },
+            {
+                "@type": "Organization",
+                "@id": "https://pdfmask.co.uk/#org",
+                "name": "pdfMask",
+                "url": "https://pdfmask.co.uk/",
+                "logo": "https://pdfmask.co.uk/assets/og-preview.png"
             },
             {
                 "@type": "FAQPage",
@@ -76,8 +64,8 @@
                     },
                     {
                         "@type": "Question",
-                        "name": "Does pdfMask help with UK GDPR?",
-                        "acceptedAnswer": { "@type": "Answer", "text": "Because files never leave your device, pdfMask does not collect, store or transfer the personal data inside your documents. That avoids adding a third-party processor for the file itself, though your organisation remains responsible for its own UK GDPR compliance." }
+                        "name": "How does pdfMask fit with UK GDPR?",
+                        "acceptedAnswer": { "@type": "Answer", "text": "pdfMask never receives your documents. They're processed on your own device, and nothing is uploaded, stored or logged. That sits well with keeping personal data to as few places as possible, though your organisation remains responsible for how it handles personal data." }
                     },
                     {
                         "@type": "Question",
@@ -89,322 +77,46 @@
         ]
     }
     </script>
-
-    <!-- PDF libraries (deferred: they run in order, before app.min.js) -->
-    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
-    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js" defer></script>
-    <script src="app.min.js" defer></script>
-
-    <style>
-        :root {
-            --primary: #2563eb;
-            --primary-hover: #1d4ed8;
-            --bg-main: #f8fafc;
-            --card-bg: #ffffff;
-            --text-main: #1e293b;
-            --text-muted: #64748b;
-            --border: #cbd5e1;
-        }
-
-        body {
-            font-family: system-ui, -apple-system, sans-serif;
-            margin: 0;
-            padding: 0;
-            color: var(--text-main);
-            background: var(--bg-main);
-            line-height: 1.55;
-        }
-
-        /* Top Menu Bar */
-        nav.navbar {
-            background: #ffffff;
-            border-bottom: 1px solid #e2e8f0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 40px;
-            height: 70px;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
-        }
-
-        .nav-brand {
-            font-weight: 700;
-            font-size: 18px;
-            color: #0f172a;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 8px;
-        }
-
-        .nav-btn {
-            background: transparent;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-weight: 600;
-            font-size: 14px;
-            color: var(--text-muted);
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .nav-btn:hover {
-            background: #f1f5f9;
-            color: var(--primary);
-        }
-
-        .nav-btn.active {
-            background: #eff6ff;
-            color: var(--primary);
-        }
-
-        .nav-badge {
-            background: #d1fae5;
-            color: #065f46;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            white-space: nowrap;
-        }
-
-        /* Hero */
-        .hero {
-            max-width: 900px;
-            margin: 40px auto 0;
-            padding: 0 20px;
-        }
-        .hero h1 {
-            font-size: 32px;
-            line-height: 1.2;
-            margin: 0 0 10px;
-            color: #0f172a;
-        }
-        .hero p {
-            margin: 0;
-            font-size: 17px;
-            color: var(--text-muted);
-            max-width: 680px;
-        }
-
-        /* Main Workspace Container */
-        .container {
-            max-width: 900px;
-            margin: 24px auto 40px;
-            padding: 0 20px;
-        }
-
-        .card {
-            background: var(--card-bg);
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-        }
-
-        .tool-panel { display: none; }
-        .tool-panel.active { display: block; }
-        .tool-panel h2 { margin-top: 0; }
-
-        /* Canvas Wrapper for Redaction Tool */
-        #canvas-wrapper {
-            position: relative;
-            display: inline-block;
-            margin-top: 15px;
-            border: 1px solid var(--border);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            cursor: crosshair;
-            max-width: 100%;
-            overflow: auto;
-        }
-        #pdf-canvas { display: block; }
-        #selection-canvas { position: absolute; top: 0; left: 0; pointer-events: auto; touch-action: none; }
-
-        .page-nav { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 4px; }
-        .page-info { font-size: 14px; color: var(--text-muted); font-weight: 500; }
-
-        button.secondary-btn {
-            background: #ffffff;
-            color: var(--text-main);
-            border: 1px solid var(--border);
-            padding: 9px 16px;
-            border-radius: 6px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-        button.secondary-btn:hover { background: #f1f5f9; }
-        button.secondary-btn:disabled { color: var(--border); background: #ffffff; cursor: not-allowed; }
-
-        .controls { margin-top: 15px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-
-        button.action-btn {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 10px 18px;
-            border-radius: 6px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-        button.action-btn:hover { background: var(--primary-hover); }
-        button.action-btn:disabled { background: var(--border); cursor: not-allowed; }
-
-        .status { font-size: 14px; color: var(--text-muted); margin-top: 12px; font-weight: 500; }
-        input[type="file"] { margin: 15px 0; display: block; max-width: 100%; }
-
-        /* Content sections */
-        .content {
-            max-width: 900px;
-            margin: 0 auto 60px;
-            padding: 0 20px;
-        }
-        .content section { margin-top: 48px; }
-        .content h2 { font-size: 24px; margin: 0 0 16px; color: #0f172a; }
-        .content h3 { font-size: 17px; margin: 0 0 6px; color: #0f172a; }
-        .content p { margin: 0 0 12px; }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 16px;
-        }
-        .tile {
-            background: var(--card-bg);
-            border: 1px solid #e2e8f0;
-            border-radius: 10px;
-            padding: 20px;
-        }
-        .tile p { color: var(--text-muted); margin: 0; font-size: 15px; }
-
-        .steps { padding-left: 20px; margin: 0; }
-        .steps li { margin-bottom: 8px; }
-
-        details {
-            background: var(--card-bg);
-            border: 1px solid #e2e8f0;
-            border-radius: 10px;
-            padding: 14px 18px;
-            margin-bottom: 10px;
-        }
-        summary { font-weight: 600; cursor: pointer; }
-        details p { margin: 10px 0 0; color: var(--text-muted); }
-
-        footer {
-            border-top: 1px solid #e2e8f0;
-            padding: 24px 20px;
-            text-align: center;
-            font-size: 14px;
-            color: var(--text-muted);
-        }
-
-        /* Phones */
-        @media (max-width: 720px) {
-            nav.navbar {
-                height: auto;
-                flex-wrap: wrap;
-                gap: 10px;
-                padding: 12px 16px;
-            }
-            .nav-links {
-                order: 3;
-                width: 100%;
-                overflow-x: auto;
-            }
-            .nav-btn { padding: 8px 12px; white-space: nowrap; }
-            .hero { margin-top: 24px; padding: 0 16px; }
-            .hero h1 { font-size: 26px; }
-            .container, .content { padding: 0 16px; }
-            .card { padding: 20px; }
-        }
-    </style>
 </head>
 <body>
 
-<!-- TOP MENU BAR -->
-<nav class="navbar" aria-label="Tools">
-    <div class="nav-brand">
-        <span>🛡️ pdfMask</span>
-    </div>
-
-    <div class="nav-links">
-        <button class="nav-btn active" onclick="switchTool(0)">Redact PDF</button>
-        <button class="nav-btn" onclick="switchTool(1)">Merge PDFs</button>
-        <button class="nav-btn" onclick="switchTool(2)">Unlock PDF</button>
-    </div>
-
-    <div>
-        <span class="nav-badge">🔒 Zero Server Uploads</span>
-    </div>
-</nav>
-
-<header class="hero">
-    <h1>Redact, merge and unlock PDFs without uploading them</h1>
-    <p>Free PDF tools that run entirely in your browser. Your documents are processed on your own device and never sent to a server, so confidential client files stay confidential.</p>
+<header class="navbar">
+    <a class="nav-brand" href="/">🛡️ pdfMask</a>
+    <nav class="nav-links" aria-label="Main">
+        <a class="nav-link" href="/redact-pdf/">Redact PDF</a>
+        <a class="nav-link" href="/merge-pdf/">Merge PDFs</a>
+        <a class="nav-link" href="/redaction-checker/">Redaction checker</a>
+        <a class="nav-link" href="/guides/">Guides</a>
+    </nav>
+    <span class="nav-badge">🔒 Zero Server Uploads</span>
 </header>
 
-<!-- MAIN APP CONTENT -->
-<main>
-    <div class="container">
-        <div class="card">
+<main class="wrap">
 
-            <!-- TOOL 1: VISUAL DRAG-AND-DROP REDACTOR -->
-            <div id="panel-0" class="tool-panel active">
-                <h2>Redact a PDF</h2>
-                <p>Choose a PDF, then <strong>click and drag</strong> over any text, numbers or images you want to remove. Mark as many areas as you need, on as many pages as you need.</p>
-
-                <input type="file" id="pdfFile" accept="application/pdf" aria-label="Choose a PDF to redact">
-
-                <div id="page-nav" class="page-nav" style="display: none;">
-                    <button id="prevPage" class="secondary-btn" disabled aria-label="Previous page">‹ Prev</button>
-                    <span id="pageInfo" class="page-info" aria-live="polite"></span>
-                    <button id="nextPage" class="secondary-btn" disabled aria-label="Next page">Next ›</button>
-                </div>
-
-                <div id="canvas-wrapper" style="display: none;">
-                    <canvas id="pdf-canvas"></canvas>
-                    <canvas id="selection-canvas"></canvas>
-                </div>
-
-                <div class="controls">
-                    <button id="applyBtn" class="action-btn" disabled>Apply Permanent Redaction & Download</button>
-                    <button id="undoBtn" class="secondary-btn" disabled>Undo</button>
-                    <button id="clearBtn" class="secondary-btn" disabled>Clear Page</button>
-                </div>
-
-                <div id="status" class="status" role="status"></div>
-            </div>
-
-            <!-- TOOL 2: MERGE SUITE -->
-            <div id="panel-1" class="tool-panel">
-                <h2>Merge PDF files</h2>
-                <p>Combine several PDFs into a single file, in the order you select them, without sending anything over the internet.</p>
-                <input type="file" id="mergeFiles" accept="application/pdf" multiple aria-label="Choose PDFs to merge">
-                <button class="action-btn" onclick="executeMerge()">Merge and Download</button>
-                <div id="mergeStatus" class="status" role="status"></div>
-            </div>
-
-            <!-- TOOL 3: UNLOCK PERMISSIONS -->
-            <div id="panel-2" class="tool-panel">
-                <h2>Remove PDF restrictions</h2>
-                <p>Remove editing, copying and printing restrictions from a PDF, entirely in your browser's memory.</p>
-                <input type="file" id="unlockFile" accept="application/pdf" aria-label="Choose a PDF to unlock">
-                <button class="action-btn" onclick="executeUnlock()">Unlock & Download</button>
-                <div id="unlockStatus" class="status" role="status"></div>
-            </div>
-
-        </div>
+    <div class="hero">
+        <h1>Private PDF tools that never upload your files</h1>
+        <p>Redact, merge and check PDFs entirely in your browser. Your documents are processed on your own device and never sent to a server, so confidential client files stay confidential.</p>
     </div>
 
     <div class="content">
+
+        <section>
+            <h2>Free PDF tools</h2>
+            <div class="grid">
+                <a class="tile" href="/redact-pdf/">
+                    <h3>Redact PDF</h3>
+                    <p>Draw a box over names, account numbers, addresses or any other sensitive detail to remove it permanently before sharing.</p>
+                </a>
+                <a class="tile" href="/redaction-checker/">
+                    <h3>Redaction checker</h3>
+                    <p>Already redacted a PDF? Check it for text still hidden under black boxes, unapplied redaction marks and other leaks.</p>
+                </a>
+                <a class="tile" href="/merge-pdf/">
+                    <h3>Merge PDFs</h3>
+                    <p>Join contracts, invoices or scanned pages into one tidy PDF in seconds.</p>
+                </a>
+            </div>
+        </section>
 
         <section>
             <h2>Why use a PDF tool that doesn't upload your files?</h2>
@@ -413,35 +125,15 @@
         </section>
 
         <section>
-            <h2>Free PDF tools</h2>
-            <div class="grid">
-                <div class="tile">
-                    <h3>Redact PDF</h3>
-                    <p>Draw a box over names, account numbers, addresses or any other sensitive detail to remove it permanently before sharing.</p>
-                </div>
-                <div class="tile">
-                    <h3>Merge PDFs</h3>
-                    <p>Join contracts, invoices or scanned pages into one tidy PDF in seconds.</p>
-                </div>
-                <div class="tile">
-                    <h3>Unlock PDF</h3>
-                    <p>Remove restrictions that stop you printing, copying or editing a PDF you're entitled to use.</p>
-                </div>
-            </div>
-        </section>
-
-        <section>
-            <h2>How it works</h2>
-            <ol class="steps">
-                <li>Pick a tool from the menu at the top of the page.</li>
-                <li>Choose your PDF. It opens in your browser and is never uploaded.</li>
-                <li>Make your changes and download the new file straight to your device.</li>
-            </ol>
+            <h2>Redaction that actually removes the content</h2>
+            <p>Drawing a black box over a PDF, or highlighting text in black, only hides it on screen. The words are still in the file, and anyone can copy them out. It's one of the most common ways confidential information leaks.</p>
+            <p><a href="/redact-pdf/">pdfMask's redactor</a> rebuilds each page you redact so the marked content is gone from the file, not just covered up. If you've received or produced a redacted PDF elsewhere, the <a href="/redaction-checker/">redaction checker</a> will show you whether anything is still hiding underneath.</p>
         </section>
 
         <section>
             <h2>Built for UK legal, finance and HR teams</h2>
-            <p>Solicitors, accountants, bookkeepers and HR teams handle personal data every day. Because pdfMask never receives your documents, it doesn't add another third party that holds your clients' information, which keeps things simpler under UK GDPR.</p>
+            <p>Solicitors, accountants, bookkeepers and HR teams handle personal data every day. Because pdfMask never receives your documents, it doesn't add another place your clients' information is sent.</p>
+            <p>Our <a href="/guides/">guides</a> walk through everyday redaction jobs, such as <a href="/guides/subject-access-request-redaction/">preparing documents for a subject access request</a>, <a href="/guides/redact-bank-statement/">sending a bank statement or payslip</a> and <a href="/guides/redact-documents-for-disclosure/">redacting documents for disclosure</a>.</p>
         </section>
 
         <section>
@@ -459,8 +151,8 @@
                 <p>Yes. All the tools are free to use, with no sign-up, no watermarks and no file limits beyond what your browser can handle.</p>
             </details>
             <details>
-                <summary>Does pdfMask help with UK GDPR?</summary>
-                <p>Because files never leave your device, pdfMask does not collect, store or transfer the personal data inside your documents. That avoids adding a third-party processor for the file itself, though your organisation remains responsible for its own UK GDPR compliance.</p>
+                <summary>How does pdfMask fit with UK GDPR?</summary>
+                <p>pdfMask never receives your documents. They're processed on your own device, and nothing is uploaded, stored or logged. That sits well with keeping personal data to as few places as possible, though your organisation remains responsible for how it handles personal data.</p>
             </details>
             <details>
                 <summary>Do I need to install anything?</summary>
@@ -471,8 +163,15 @@
     </div>
 </main>
 
-<footer>
+<footer class="site-footer">
+    <nav class="footer-links" aria-label="Footer">
+        <a href="/redact-pdf/">Redact PDF</a>
+        <a href="/merge-pdf/">Merge PDFs</a>
+        <a href="/redaction-checker/">Redaction checker</a>
+        <a href="/guides/">Guides</a>
+    </nav>
     <p>© 2026 pdfMask · Private PDF tools that run in your browser · Made in the UK</p>
+    <p>Guides on this site are general information, not legal advice.</p>
 </footer>
 
 </body>

@@ -2,6 +2,10 @@
   "name": "pdfmask",
   "compatibility_date": "2026-10-16",
   "assets": {
-    "directory": "./"
+    "directory": "./",
+    // /redact-pdf/ serves redact-pdf/index.html, and /redact-pdf redirects to /redact-pdf/.
+    "html_handling": "auto-trailing-slash",
+    // Unknown URLs get 404.html with a proper 404 status.
+    "not_found_handling": "404-page"
   }
 }

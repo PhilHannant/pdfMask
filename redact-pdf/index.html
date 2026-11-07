@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Redact PDF Online Free – No Uploads | pdfMask</title>
+    <meta name="description"
+          content="Permanently black out names, account numbers and other details in a PDF, free in your browser. Nothing is uploaded, and hidden text is removed, not just covered.">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <meta name="theme-color" content="#2563eb">
+    <link rel="canonical" href="https://pdfmask.co.uk/redact-pdf/">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
+    <link rel="stylesheet" href="/assets/site.css">
+
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="pdfMask">
+    <meta property="og:url" content="https://pdfmask.co.uk/redact-pdf/">
+    <meta property="og:title" content="Redact a PDF Permanently, Without Uploading It">
+    <meta property="og:description" content="Black out sensitive details in a PDF for free, entirely in your browser. The hidden content is removed from the file, not just covered up.">
+    <meta property="og:image" content="https://pdfmask.co.uk/assets/og-preview.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="pdfMask – private PDF tools that run in your browser">
+    <meta property="og:locale" content="en_GB">
+    <meta name="twitter:card" content="summary_large_image">
+
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@graph": [
+            {
+                "@type": "WebApplication",
+                "@id": "https://pdfmask.co.uk/redact-pdf/#app",
+                "name": "pdfMask Redact PDF",
+                "url": "https://pdfmask.co.uk/redact-pdf/",
+                "description": "Free browser-based tool that permanently redacts PDFs without uploading them. Redacted pages are rebuilt so the hidden content is removed from the file.",
+                "applicationCategory": "BusinessApplication",
+                "operatingSystem": "Any (web browser)",
+                "browserRequirements": "Requires JavaScript",
+                "inLanguage": "en-GB",
+                "isAccessibleForFree": true,
+                "featureList": [
+                    "Permanently remove text, numbers and images from a PDF",
+                    "Mark several areas on any page",
+                    "Works on rotated pages and filled-in forms",
+                    "All processing happens on your device with no file uploads"
+                ],
+                "offers": { "@type": "Offer", "price": "0", "priceCurrency": "GBP" },
+                "publisher": { "@type": "Organization", "name": "pdfMask", "url": "https://pdfmask.co.uk/" }
+            },
+            {
+                "@type": "BreadcrumbList",
+                "itemListElement": [
+                    { "@type": "ListItem", "position": 1, "name": "pdfMask", "item": "https://pdfmask.co.uk/" },
+                    { "@type": "ListItem", "position": 2, "name": "Redact PDF", "item": "https://pdfmask.co.uk/redact-pdf/" }
+                ]
+            },
+            {
+                "@type": "FAQPage",
+                "mainEntity": [
+                    {
+                        "@type": "Question",
+                        "name": "Is the redaction permanent, or just a black box on top?",
+                        "acceptedAnswer": { "@type": "Answer", "text": "It's permanent. Drawing a black box over a PDF leaves the text underneath in the file, where anyone can copy it. pdfMask rebuilds every page you redact as a flat image with the marked areas blacked out, so the hidden text, images and data are removed from the file entirely. Pages you don't redact are kept exactly as they were." }
+                    },
+                    {
+                        "@type": "Question",
+                        "name": "Why can't I select the text on redacted pages any more?",
+                        "acceptedAnswer": { "@type": "Answer", "text": "Each redacted page is turned into an image so that nothing from the original page can survive inside the file. The trade-off is that text on those pages can no longer be selected or searched. Pages without redactions keep their normal, selectable text." }
+                    },
+                    {
+                        "@type": "Question",
+                        "name": "Does the redacted file keep the original's title and author?",
+                        "acceptedAnswer": { "@type": "Answer", "text": "No. pdfMask creates a fresh file, so the original's document properties, bookmarks, attachments and form fields aren't carried over." }
+                    },
+                    {
+                        "@type": "Question",
+                        "name": "Can I redact a password-protected PDF?",
+                        "acceptedAnswer": { "@type": "Answer", "text": "If the PDF needs a password to open, remove the password first using the software you normally open it with, then redact the unlocked copy." }
+                    }
+                ]
+            }
+        ]
+    }
+    </script>
+
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js" defer></script>
+    <script src="/app.min.js" defer></script>
+</head>
+<body>
+
+<header class="navbar">
+    <a class="nav-brand" href="/">🛡️ pdfMask</a>
+    <nav class="nav-links" aria-label="Main">
+        <a class="nav-link" href="/redact-pdf/" aria-current="page">Redact PDF</a>
+        <a class="nav-link" href="/merge-pdf/">Merge PDFs</a>
+        <a class="nav-link" href="/redaction-checker/">Redaction checker</a>
+        <a class="nav-link" href="/guides/">Guides</a>
+    </nav>
+    <span class="nav-badge">🔒 Zero Server Uploads</span>
+</header>
+
+<main class="wrap">
+
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+        <ol>
+            <li><a href="/">pdfMask</a></li>
+            <li aria-current="page">Redact PDF</li>
+        </ol>
+    </nav>
+
+    <div class="hero">
+        <h1>Redact a PDF permanently, without uploading it</h1>
+        <p>Black out names, account numbers, addresses or anything else before you share a PDF. The content you mark is removed from the file, not just covered up, and your document never leaves your device.</p>
+    </div>
+
+    <div class="card">
+        <h2>Redact your PDF</h2>
+        <p>Choose a PDF, then <strong>click and drag</strong> over any text, numbers or images you want to remove. Mark as many areas as you need, on as many pages as you need.</p>
+
+        <input type="file" id="pdfFile" accept="application/pdf" aria-label="Choose a PDF to redact">
+
+        <div id="page-nav" class="page-nav" style="display: none;">
+            <button id="prevPage" class="secondary-btn" disabled aria-label="Previous page">‹ Prev</button>
+            <span id="pageInfo" class="page-info" aria-live="polite"></span>
+            <button id="nextPage" class="secondary-btn" disabled aria-label="Next page">Next ›</button>
+        </div>
+
+        <div id="canvas-wrapper" style="display: none;">
+            <canvas id="pdf-canvas"></canvas>
+            <canvas id="selection-canvas"></canvas>
+        </div>
+
+        <div class="controls">
+            <button id="applyBtn" class="action-btn" disabled>Apply Permanent Redaction &amp; Download</button>
+            <button id="undoBtn" class="secondary-btn" disabled>Undo</button>
+            <button id="clearBtn" class="secondary-btn" disabled>Clear Page</button>
+        </div>
+
+        <div id="status" class="status" role="status"></div>
+    </div>
+
+    <div class="content">
+
+        <section>
+            <h2>How to redact a PDF</h2>
+            <ol class="steps">
+                <li>Choose your PDF above. It opens in your browser and is never uploaded.</li>
+                <li>Click and drag a box over each piece of information you want to remove. Use <strong>Prev</strong> and <strong>Next</strong> to move between pages.</li>
+                <li>Click <strong>Apply Permanent Redaction &amp; Download</strong>. A new copy is saved to your device with <em>-redacted</em> added to the name.</li>
+                <li>Open the new file and check it. You can also run it through the <a href="/redaction-checker/">redaction checker</a> for peace of mind.</li>
+            </ol>
+        </section>
+
+        <section>
+            <h2>Why a black box isn't enough</h2>
+            <p>Most PDF editors let you draw a black rectangle or highlight text in black. That changes how the page looks, but the original text is still inside the file. Anyone can select it, copy it, or search for it. Redaction failures like this regularly make the news, from court filings to government reports.</p>
+            <p>pdfMask avoids this by rebuilding every page you redact. The page is redrawn as a flat image with your marked areas painted solid black, and that image replaces the original page. The hidden text, fonts and form values on the page are gone from the file, so there's nothing left to copy out.</p>
+            <div class="callout">
+                <p>Not sure whether a PDF you've already redacted is safe? <a href="/redaction-checker/">Check it for hidden text</a>.</p>
+            </div>
+        </section>
+
+        <section>
+            <h2>What you can redact</h2>
+            <div class="grid">
+                <div class="tile">
+                    <h3>Personal details</h3>
+                    <p>Names, addresses, dates of birth, phone numbers, National Insurance numbers and signatures.</p>
+                </div>
+                <div class="tile">
+                    <h3>Financial information</h3>
+                    <p>Account and sort codes, card numbers, salaries, transactions and balances.</p>
+                </div>
+                <div class="tile">
+                    <h3>Anything else on the page</h3>
+                    <p>Photos, logos, handwriting, form entries and scanned content. If you can see it, you can remove it.</p>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>Good to know</h2>
+            <ul>
+                <li><strong>Redacted pages become images,</strong> so their text can't be selected or searched afterwards. Pages you don't redact keep their normal text.</li>
+                <li><strong>The file gets a little bigger,</strong> typically a few hundred kilobytes to around a megabyte per redacted page.</li>
+                <li><strong>You get a fresh file.</strong> The original's title, author, bookmarks, attachments and form fields aren't carried over.</li>
+                <li><strong>Check before you send.</strong> Make sure you've marked every instance of the information, including in headers, footers and page numbers.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>Frequently asked questions</h2>
+            <details>
+                <summary>Is the redaction permanent, or just a black box on top?</summary>
+                <p>It's permanent. Drawing a black box over a PDF leaves the text underneath in the file, where anyone can copy it. pdfMask rebuilds every page you redact as a flat image with the marked areas blacked out, so the hidden text, images and data are removed from the file entirely. Pages you don't redact are kept exactly as they were.</p>
+            </details>
+            <details>
+                <summary>Why can't I select the text on redacted pages any more?</summary>
+                <p>Each redacted page is turned into an image so that nothing from the original page can survive inside the file. The trade-off is that text on those pages can no longer be selected or searched. Pages without redactions keep their normal, selectable text.</p>
+            </details>
+            <details>
+                <summary>Does the redacted file keep the original's title and author?</summary>
+                <p>No. pdfMask creates a fresh file, so the original's document properties, bookmarks, attachments and form fields aren't carried over.</p>
+            </details>
+            <details>
+                <summary>Can I redact a password-protected PDF?</summary>
+                <p>If the PDF needs a password to open, remove the password first using the software you normally open it with, then redact the unlocked copy.</p>
+            </details>
+        </section>
+
+        <section>
+            <h2>Redaction guides</h2>
+            <ul>
+                <li><a href="/guides/subject-access-request-redaction/">Redacting documents for a subject access request</a></li>
+                <li><a href="/guides/redact-bank-statement/">How to redact a bank statement or payslip</a></li>
+                <li><a href="/guides/redact-documents-for-disclosure/">Redacting PDFs for disclosure: a practical checklist</a></li>
+            </ul>
+        </section>
+
+    </div>
+</main>
+
+<footer class="site-footer">
+    <nav class="footer-links" aria-label="Footer">
+        <a href="/redact-pdf/">Redact PDF</a>
+        <a href="/merge-pdf/">Merge PDFs</a>
+        <a href="/redaction-checker/">Redaction checker</a>
+        <a href="/guides/">Guides</a>
+    </nav>
+    <p>© 2026 pdfMask · Private PDF tools that run in your browser · Made in the UK</p>
+    <p>Guides on this site are general information, not legal advice.</p>
+</footer>
+
+</body>
+</html>

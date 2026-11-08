@@ -81,18 +81,22 @@ async function buildFixture() {
 }
 
 async function openRedactor(file) {
-    const context = await browser.newContext({ viewport: { width: 1280, height: 1000 }, acceptDownloads: true });
+    // Tall enough that every box we draw is on screen whatever fonts the
+    // machine has: mouse events outside the window are never delivered.
+    const context = await browser.newContext({ viewport: { width: 1280, height: 1800 }, acceptDownloads: true });
     await routeLocalLibs(context);
     const page = await context.newPage();
     const errors = [];
     page.on('pageerror', e => errors.push(e.message));
-    await page.goto(baseUrl, { waitUntil: 'networkidle' });
+    await page.goto(baseUrl + 'redact-pdf/', { waitUntil: 'networkidle' });
     await page.setInputFiles('#pdfFile', file);
     return { page, context, errors };
 }
 
 async function drawBox(page, b) {
     const r = await page.locator('#selection-canvas').boundingBox();
+    const viewport = page.viewportSize();
+    assert.ok(r.y + b.y1 * r.height < viewport.height, 'box would be drawn off-screen; make the test window taller');
     await page.mouse.move(r.x + b.x0 * r.width, r.y + b.y0 * r.height);
     await page.mouse.down();
     await page.mouse.move(r.x + b.x1 * r.width, r.y + b.y1 * r.height, { steps: 5 });
@@ -194,6 +198,15 @@ test('redacted content is removed from the file, everything else survives', asyn
         return dark;
     }, Array.from(output));
     assert.ok(headingInk > 50, 'heading outside the boxes should still be visible');
+
+    // 4. pdfMask's own redaction checker finds nothing wrong with the result.
+    const outFile = path.join(tmp, 'client-file-redacted.pdf');
+    fs.writeFileSync(outFile, output);
+    await page.goto(baseUrl + 'redaction-checker/', { waitUntil: 'networkidle' });
+    await page.setInputFiles('#checkFile', outFile);
+    await page.waitForSelector('#checkResults .verdict', { timeout: 30000 });
+    assert.match(await page.getAttribute('#checkResults .verdict', 'class'), /\bok\b/,
+        await page.textContent('#checkResults'));
 
     assert.deepEqual(errors, []);
     await context.close();

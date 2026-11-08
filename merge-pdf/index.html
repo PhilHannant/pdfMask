@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Merge PDF Files Free – No Uploads | pdfMask</title>
+    <meta name="description"
+          content="Combine several PDFs into one file, free and entirely in your browser. Contracts, invoices and statements are merged on your device and never uploaded.">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <meta name="theme-color" content="#2563eb">
+    <link rel="canonical" href="https://pdfmask.co.uk/merge-pdf/">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
+    <link rel="stylesheet" href="/assets/site.css">
+
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="pdfMask">
+    <meta property="og:url" content="https://pdfmask.co.uk/merge-pdf/">
+    <meta property="og:title" content="Merge PDFs Free, Without Uploading Them">
+    <meta property="og:description" content="Combine PDFs into one file entirely in your browser. Nothing is uploaded.">
+    <meta property="og:image" content="https://pdfmask.co.uk/assets/og-preview.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="pdfMask – private PDF tools that run in your browser">
+    <meta property="og:locale" content="en_GB">
+    <meta name="twitter:card" content="summary_large_image">
+
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@graph": [
+            {
+                "@type": "WebApplication",
+                "@id": "https://pdfmask.co.uk/merge-pdf/#app",
+                "name": "pdfMask Merge PDFs",
+                "url": "https://pdfmask.co.uk/merge-pdf/",
+                "description": "Free browser-based tool that combines several PDF files into one without uploading them.",
+                "applicationCategory": "BusinessApplication",
+                "operatingSystem": "Any (web browser)",
+                "browserRequirements": "Requires JavaScript",
+                "inLanguage": "en-GB",
+                "isAccessibleForFree": true,
+                "offers": { "@type": "Offer", "price": "0", "priceCurrency": "GBP" },
+                "publisher": { "@type": "Organization", "name": "pdfMask", "url": "https://pdfmask.co.uk/" }
+            },
+            {
+                "@type": "BreadcrumbList",
+                "itemListElement": [
+                    { "@type": "ListItem", "position": 1, "name": "pdfMask", "item": "https://pdfmask.co.uk/" },
+                    { "@type": "ListItem", "position": 2, "name": "Merge PDFs", "item": "https://pdfmask.co.uk/merge-pdf/" }
+                ]
+            }
+        ]
+    }
+    </script>
+
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js" defer></script>
+    <script src="/app.min.js" defer></script>
+</head>
+<body>
+
+<header class="navbar">
+    <a class="nav-brand" href="/">🛡️ pdfMask</a>
+    <nav class="nav-links" aria-label="Main">
+        <a class="nav-link" href="/redact-pdf/">Redact PDF</a>
+        <a class="nav-link" href="/merge-pdf/" aria-current="page">Merge PDFs</a>
+        <a class="nav-link" href="/redaction-checker/">Redaction checker</a>
+        <a class="nav-link" href="/guides/">Guides</a>
+    </nav>
+    <span class="nav-badge">🔒 Zero Server Uploads</span>
+</header>
+
+<main class="wrap">
+
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+        <ol>
+            <li><a href="/">pdfMask</a></li>
+            <li aria-current="page">Merge PDFs</li>
+        </ol>
+    </nav>
+
+    <div class="hero">
+        <h1>Merge PDF files without uploading them</h1>
+        <p>Combine contracts, invoices, statements or scanned pages into a single PDF. Everything happens in your browser, so your files never leave your device.</p>
+    </div>
+
+    <div class="card">
+        <h2>Merge your PDFs</h2>
+        <p>Choose two or more PDFs. They're joined in the order shown below.</p>
+        <input type="file" id="mergeFiles" accept="application/pdf" multiple aria-label="Choose PDFs to merge">
+        <ol id="mergeList" class="file-list"></ol>
+        <button id="mergeBtn" class="action-btn" disabled>Merge and Download</button>
+        <div id="mergeStatus" class="status" role="status"></div>
+    </div>
+
+    <div class="content">
+
+        <section>
+            <h2>How to merge PDFs</h2>
+            <ol class="steps">
+                <li>Click <strong>Choose files</strong> and select all the PDFs you want to combine. Hold Ctrl (or Cmd on a Mac) to pick several at once.</li>
+                <li>Check the order in the list. To change it, choose the files again in the order you want.</li>
+                <li>Click <strong>Merge and Download</strong>. The combined PDF is saved straight to your device.</li>
+            </ol>
+        </section>
+
+        <section>
+            <h2>Private by design</h2>
+            <p>Most online tools upload your files to their servers to merge them. pdfMask does the work in your browser instead, so bank statements, contracts and client documents are never sent anywhere.</p>
+            <p>Need to remove something before you combine files? <a href="/redact-pdf/">Redact the PDF first</a>, then merge the redacted copy.</p>
+        </section>
+
+        <section>
+            <h2>Good to know</h2>
+            <ul>
+                <li>Pages keep their original quality and text. Nothing is converted or compressed.</li>
+                <li>Password-protected or restricted PDFs can't be merged. Open them in your usual software and save an unprotected copy first.</li>
+                <li>Very large files depend on your device's memory, but most everyday documents merge in a few seconds.</li>
+            </ul>
+        </section>
+
+    </div>
+</main>
+
+<footer class="site-footer">
+    <nav class="footer-links" aria-label="Footer">
+        <a href="/redact-pdf/">Redact PDF</a>
+        <a href="/merge-pdf/">Merge PDFs</a>
+        <a href="/redaction-checker/">Redaction checker</a>
+        <a href="/guides/">Guides</a>
+    </nav>
+    <p>© 2026 pdfMask · Private PDF tools that run in your browser · Made in the UK</p>
+    <p>Guides on this site are general information, not legal advice.</p>
+</footer>
+
+</body>
+</html>

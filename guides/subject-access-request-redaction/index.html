@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Redacting Documents for a Subject Access Request | pdfMask</title>
+    <meta name="description"
+          content="A practical guide to redacting PDFs for a subject access request (DSAR): preparing documents, common mistakes, and checking files before you send them.">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <meta name="theme-color" content="#2563eb">
+    <link rel="canonical" href="https://pdfmask.co.uk/guides/subject-access-request-redaction/">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
+    <link rel="stylesheet" href="/assets/site.css">
+
+    <meta property="og:type" content="article">
+    <meta property="og:site_name" content="pdfMask">
+    <meta property="og:url" content="https://pdfmask.co.uk/guides/subject-access-request-redaction/">
+    <meta property="og:title" content="Redacting Documents for a Subject Access Request">
+    <meta property="og:description" content="How to redact DSAR documents so the hidden details really are gone, and how to check before you send.">
+    <meta property="og:image" content="https://pdfmask.co.uk/assets/og-preview.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="pdfMask – private PDF tools that run in your browser">
+    <meta property="og:locale" content="en_GB">
+    <meta name="twitter:card" content="summary_large_image">
+
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@graph": [
+            {
+                "@type": "Article",
+                "headline": "Redacting documents for a subject access request",
+                "description": "A practical guide to redacting PDFs for a subject access request: preparing documents, the mistakes that expose redacted details, and checking files before you send them.",
+                "url": "https://pdfmask.co.uk/guides/subject-access-request-redaction/",
+                "mainEntityOfPage": "https://pdfmask.co.uk/guides/subject-access-request-redaction/",
+                "datePublished": "2026-11-07",
+                "dateModified": "2026-11-07",
+                "inLanguage": "en-GB",
+                "image": "https://pdfmask.co.uk/assets/og-preview.png",
+                "author": { "@type": "Organization", "name": "pdfMask", "url": "https://pdfmask.co.uk/" },
+                "publisher": { "@type": "Organization", "name": "pdfMask", "url": "https://pdfmask.co.uk/" }
+            },
+            {
+                "@type": "BreadcrumbList",
+                "itemListElement": [
+                    { "@type": "ListItem", "position": 1, "name": "pdfMask", "item": "https://pdfmask.co.uk/" },
+                    { "@type": "ListItem", "position": 2, "name": "Guides", "item": "https://pdfmask.co.uk/guides/" },
+                    { "@type": "ListItem", "position": 3, "name": "Subject access request redaction", "item": "https://pdfmask.co.uk/guides/subject-access-request-redaction/" }
+                ]
+            }
+        ]
+    }
+    </script>
+</head>
+<body>
+
+<header class="navbar">
+    <a class="nav-brand" href="/">🛡️ pdfMask</a>
+    <nav class="nav-links" aria-label="Main">
+        <a class="nav-link" href="/redact-pdf/">Redact PDF</a>
+        <a class="nav-link" href="/merge-pdf/">Merge PDFs</a>
+        <a class="nav-link" href="/redaction-checker/">Redaction checker</a>
+        <a class="nav-link" href="/guides/">Guides</a>
+    </nav>
+    <span class="nav-badge">🔒 Zero Server Uploads</span>
+</header>
+
+<main class="wrap">
+
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+        <ol>
+            <li><a href="/">pdfMask</a></li>
+            <li><a href="/guides/">Guides</a></li>
+            <li aria-current="page">Subject access request redaction</li>
+        </ol>
+    </nav>
+
+    <article class="content prose">
+        <div class="hero">
+            <h1>Redacting documents for a subject access request</h1>
+            <p>When someone asks for a copy of the personal information you hold about them, the documents you find often mention other people too. This guide covers the practical side of redacting those documents so the details you remove really are gone.</p>
+        </div>
+
+        <div class="callout">
+            <p><strong>This guide is about the mechanics of redacting PDFs.</strong> It isn't legal advice, and it doesn't cover what you should disclose or withhold. For that, see the Information Commissioner's Office (ICO) guidance on the <a href="https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/individual-rights/right-of-access/" rel="noopener">right of access</a>.</p>
+        </div>
+
+        <section>
+            <h2>Before you start</h2>
+            <p>A subject access response often brings together emails, HR records, case notes, letters and meeting minutes. A little preparation makes the redaction step quicker and safer:</p>
+            <ul>
+                <li><strong>Get everything into PDF.</strong> Save emails and Word documents as PDFs so you can review and redact them in one format.</li>
+                <li><strong>Keep the originals untouched.</strong> Redact copies, and store the unredacted set separately so you can go back to it.</li>
+                <li><strong>Keep a simple log.</strong> Many teams note what they redacted on each document and why, so decisions can be explained later if they're questioned.</li>
+                <li><strong>Remove exact duplicates.</strong> The same email often turns up several times. Fewer copies means fewer places to miss something.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>What gets redacted</h2>
+            <p>What to remove from each document is a judgement for your organisation, and the ICO's guidance explains how to approach it. In practice, the kinds of details people commonly look at include:</p>
+            <ul>
+                <li>names, contact details and job titles of other individuals</li>
+                <li>information about someone else, such as a colleague's absence or a family member's circumstances</li>
+                <li>email addresses and signatures in forwarded chains and quoted replies</li>
+                <li>handwritten notes, initials and signatures on scanned documents</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>How to redact the documents with pdfMask</h2>
+            <ol class="steps">
+                <li>Open the <a href="/redact-pdf/">Redact PDF</a> tool and choose a document. It opens in your browser and isn't uploaded anywhere.</li>
+                <li>Drag a box over each detail you're removing. Use <strong>Prev</strong> and <strong>Next</strong> to work through every page.</li>
+                <li>Click <strong>Apply Permanent Redaction &amp; Download</strong>. You get a new copy with the marked content removed from the file, not just covered up.</li>
+                <li>Run the new file through the <a href="/redaction-checker/">redaction checker</a> to make sure nothing is still hiding underneath.</li>
+                <li>When all the documents are ready, you can <a href="/merge-pdf/">merge them into one PDF</a> if you'd like to send a single file.</li>
+            </ol>
+        </section>
+
+        <section>
+            <h2>Mistakes that expose redacted details</h2>
+            <p>Redaction failures usually aren't about the decisions. They're about the method. The most common ones:</p>
+            <ul>
+                <li><strong>Black boxes and highlighting.</strong> Drawing a shape over text, or highlighting it in black, only hides it on screen. The words can still be copied out. This is the single most common failure.</li>
+                <li><strong>White boxes or white text.</strong> The same problem, just harder to spot.</li>
+                <li><strong>Marking but not applying.</strong> Some PDF software lets you mark areas for redaction and then apply them as a separate step. If that step is missed, nothing is removed.</li>
+                <li><strong>Missing repeats.</strong> A name in an email thread can appear in the header, the greeting, the signature and every quoted reply below it.</li>
+                <li><strong>Document properties and file names.</strong> A PDF's title or author, or a file called "Grievance – J Smith.pdf", can reveal what you've redacted inside it.</li>
+                <li><strong>Comments and attachments.</strong> Notes, comments and attached files aren't redacted along with the page.</li>
+            </ul>
+            <p>pdfMask's redactor avoids the first three by rebuilding each redacted page, and it creates a fresh file without the original's properties, comments or attachments. File names and repeated mentions still need a careful human eye.</p>
+        </section>
+
+        <section>
+            <h2>Check before you send</h2>
+            <p>Whichever tool you use, check every redacted document before it goes out. The <a href="/redaction-checker/">redaction checker</a> looks for text hidden under boxes, redaction marks that were never applied, earlier saved versions inside the file, document properties and attachments. You can also do a quick manual test: select the text across a redacted area, copy it, and paste it into a plain text editor. If anything appears, the redaction didn't work.</p>
+        </section>
+
+        <section>
+            <h2>Why it matters where the files are processed</h2>
+            <p>A subject access bundle is, by its nature, full of personal data, often about several people. Uploading it to an online PDF service sends all of that to another company's servers.</p>
+            <p>pdfMask processes documents on your own device instead. Nothing is uploaded, stored or logged, which sits well with keeping personal data in as few places as possible.</p>
+        </section>
+
+        <section>
+            <h2>Frequently asked questions</h2>
+            <details>
+                <summary>Does pdfMask tell me what to redact?</summary>
+                <p>No. pdfMask removes whatever you mark, permanently. Deciding what to remove is up to you and your organisation, and the ICO's guidance is the place to start.</p>
+            </details>
+            <details>
+                <summary>Can I redact emails?</summary>
+                <p>Yes. Save or print each email to PDF first, then redact the PDF. Check quoted replies and signatures further down the thread.</p>
+            </details>
+            <details>
+                <summary>Will the redacted documents still be searchable?</summary>
+                <p>Pages you redact are turned into images so nothing from the original page survives, which means their text can't be selected or searched. Pages without redactions keep their normal text.</p>
+            </details>
+        </section>
+
+        <section>
+            <h2>Further reading</h2>
+            <ul>
+                <li><a href="https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/individual-rights/right-of-access/" rel="noopener">ICO: Right of access</a></li>
+                <li><a href="/redaction-checker/">How to check a redacted PDF for hidden text</a></li>
+                <li><a href="/guides/redact-documents-for-disclosure/">Redacting PDFs for disclosure: a practical checklist</a></li>
+            </ul>
+        </section>
+
+        <p class="note">This guide is general information about redacting PDF documents. It isn't legal advice. Published 7 November 2026.</p>
+    </article>
+</main>
+
+<footer class="site-footer">
+    <nav class="footer-links" aria-label="Footer">
+        <a href="/redact-pdf/">Redact PDF</a>
+        <a href="/merge-pdf/">Merge PDFs</a>
+        <a href="/redaction-checker/">Redaction checker</a>
+        <a href="/guides/">Guides</a>
+    </nav>
+    <p>© 2026 pdfMask · Private PDF tools that run in your browser · Made in the UK</p>
+    <p>Guides on this site are general information, not legal advice.</p>
+</footer>
+
+</body>
+</html>

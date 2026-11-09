@@ -45,9 +45,16 @@ async function openTool(pagePath) {
     return { page, context, errors };
 }
 
-const statusMatches = (page, pattern) => page.waitForFunction(
-    p => new RegExp(p, 'i').test(document.getElementById('unlockStatus').textContent),
-    pattern.source, { timeout: ENGINE_TIMEOUT });
+async function statusMatches(page, pattern) {
+    try {
+        await page.waitForFunction(
+            p => new RegExp(p, 'i').test(document.getElementById('unlockStatus').textContent),
+            pattern.source, { timeout: ENGINE_TIMEOUT });
+    } catch (err) {
+        const actual = await page.textContent('#unlockStatus');
+        throw new Error(`Expected the status to match ${pattern}, but it says: "${actual}"`);
+    }
+}
 
 async function unlockAndRead(page) {
     const [download] = await Promise.all([

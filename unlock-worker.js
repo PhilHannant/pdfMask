@@ -35,9 +35,14 @@ async function qpdf(args, input) {
 }
 
 // qpdf exit codes: 0 = success, 2 = error, 3 = success with warnings.
-// --is-encrypted:      0 = encrypted, 2 = not encrypted
-// --requires-password: 0 = a password is needed to open it,
-//                      3 = encrypted, but it opens without one (restrictions only)
+// --is-encrypted: 0 = encrypted, 2 = not encrypted
+//
+// To tell "restrictions only" from "needs a password", we simply try to
+// decrypt without a password: that works only if the file opens without one.
+// This doesn't depend on qpdf's --requires-password exit codes, which differ
+// between qpdf versions.
+
+const decrypted = result => (result.code === 0 || result.code === 3) && result.output && result.output.length > 0;
 
 self.onmessage = async ({ data }) => {
     const { id, op, bytes, password } = data;
@@ -50,16 +55,15 @@ self.onmessage = async ({ data }) => {
                 reply({ encrypted: false });
                 return;
             }
-            const required = await qpdf(['--requires-password', '/in.pdf'], bytes);
-            reply({ encrypted: true, needsPassword: required.code === 0 });
+            const attempt = await qpdf(['--decrypt', '/in.pdf', '/out.pdf'], bytes);
+            reply({ encrypted: true, needsPassword: !decrypted(attempt) });
             return;
         }
 
         if (op === 'unlock') {
             const args = password ? ['--password=' + password] : [];
             const result = await qpdf([...args, '--decrypt', '/in.pdf', '/out.pdf'], bytes);
-            const ok = (result.code === 0 || result.code === 3) && result.output && result.output.length > 0;
-            if (ok) {
+            if (decrypted(result)) {
                 reply({ ok: true, bytes: result.output }, [result.output.buffer]);
             } else {
                 reply({ ok: false, code: result.code });

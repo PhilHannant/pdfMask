@@ -7,5 +7,9 @@
     "html_handling": "auto-trailing-slash",
     // Unknown URLs get 404.html with a proper 404 status.
     "not_found_handling": "404-page"
-  }
+  },
+  // Pull request branches are built as Worker Previews (npx wrangler preview),
+  // which needs this block. The site has no variables or bindings, so there is
+  // nothing to override and it stays empty. Assets stay at the top level.
+  "previews": {}
 }

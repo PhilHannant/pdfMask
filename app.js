@@ -512,6 +512,10 @@ function initUnlock() {
             bytes = new Uint8Array(await file.arrayBuffer());
             const info = await ask('inspect');
             if (info.error) throw new Error(info.error);
+            if (info.damaged) {
+                status.textContent = 'This file couldn\'t be read as a PDF. It may be damaged.';
+                return;
+            }
             if (!info.encrypted) {
                 status.textContent = 'This PDF isn\'t locked. It has no password or restrictions to remove.';
                 return;

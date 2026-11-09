@@ -35,12 +35,25 @@ async function qpdf(args, input) {
 }
 
 // qpdf exit codes: 0 = success, 2 = error, 3 = success with warnings.
-// --is-encrypted: 0 = encrypted, 2 = not encrypted
 //
-// To tell "restrictions only" from "needs a password", we simply try to
-// decrypt without a password: that works only if the file opens without one.
-// This doesn't depend on qpdf's --requires-password exit codes, which differ
-// between qpdf versions.
+// Working out what kind of file this is, using only behaviour that is the
+// same across qpdf versions:
+//  1. Try to decrypt without a password. That works only if the file opens
+//     without one. If it fails, the file needs a password, or is damaged.
+//     Every encrypted PDF names an /Encrypt dictionary in its trailer, which
+//     is never itself encrypted, so its absence means "damaged".
+//  2. If it opens, --is-encrypted (0 = encrypted, 2 = not) tells
+//     "restrictions only" from "not locked at all". (On a file that needs a
+//     password, qpdf 12 can't answer that question, hence the order.)
+
+function hasEncryptDictionary(bytes) {
+    // Latin-1 keeps every byte as one character, so this is a plain byte search.
+    let text = '';
+    for (let i = 0; i < bytes.length; i += 0x8000) {
+        text += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+    }
+    return /\/Encrypt\b/.test(text);
+}
 
 const decrypted = result => (result.code === 0 || result.code === 3) && result.output && result.output.length > 0;
 
@@ -50,13 +63,17 @@ self.onmessage = async ({ data }) => {
 
     try {
         if (op === 'inspect') {
-            const encrypted = await qpdf(['--is-encrypted', '/in.pdf'], bytes);
-            if (encrypted.code !== 0) {
-                reply({ encrypted: false });
+            const attempt = await qpdf(['--decrypt', '/in.pdf', '/out.pdf'], bytes);
+            if (!decrypted(attempt)) {
+                if (hasEncryptDictionary(bytes)) {
+                    reply({ encrypted: true, needsPassword: true });
+                } else {
+                    reply({ damaged: true });
+                }
                 return;
             }
-            const attempt = await qpdf(['--decrypt', '/in.pdf', '/out.pdf'], bytes);
-            reply({ encrypted: true, needsPassword: !decrypted(attempt) });
+            const encrypted = await qpdf(['--is-encrypted', '/in.pdf'], bytes);
+            reply({ encrypted: encrypted.code === 0, needsPassword: false });
             return;
         }
 

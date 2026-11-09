@@ -108,6 +108,15 @@ test('removes a known password, and rejects a wrong one', { skip }, async () => 
     await context.close();
 });
 
+test('says so when a file is damaged rather than asking for a password', { skip }, async () => {
+    const { page, context } = await openTool('unlock-pdf/');
+    await page.setInputFiles('#unlockFile', { name: 'broken.pdf', mimeType: 'application/pdf', buffer: Buffer.from('%PDF-1.7\nnot really a pdf') });
+    await statusMatches(page, /couldn't be read/);
+    assert.equal(await page.isVisible('#unlockPassword'), false);
+    assert.equal(await page.isDisabled('#unlockBtn'), true);
+    await context.close();
+});
+
 test('says so when a PDF is not locked', { skip }, async () => {
     const { page, context } = await openTool('unlock-pdf/');
     await page.setInputFiles('#unlockFile', path.join(FIXTURES, 'not-locked.pdf'));

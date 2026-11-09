@@ -13,6 +13,7 @@ const byId = id => document.getElementById(id);
 if (byId('pdfFile')) initRedactor();
 if (byId('mergeFiles')) initMerge();
 if (byId('checkFile')) initChecker();
+if (byId('unlockFile')) initUnlock();
 
 function errorText(err) {
     return err && err.message ? err.message : String(err);
@@ -85,7 +86,7 @@ function initRedactor() {
         } catch (err) {
             rawArrayBuffer = null;
             statusDiv.textContent = err && err.name === 'PasswordException'
-                ? 'This PDF needs a password to open. Remove the password first, then try again.'
+                ? 'This PDF needs a password to open. Remove the password first with pdfMask\'s Remove PDF Password tool, then try again.'
                 : 'Could not open this PDF: ' + errorText(err);
             return;
         }
@@ -413,7 +414,7 @@ function initMerge() {
                     pdf = await PDFDocument.load(new Uint8Array(await file.arrayBuffer()));
                 } catch (err) {
                     throw new Error(/encrypted/i.test(errorText(err))
-                        ? `"${file.name}" is password-protected or restricted, so it can't be merged.`
+                        ? `"${file.name}" is password-protected or restricted, so it can't be merged. Unlock it first with pdfMask's Unlock PDF tool, then try again.`
                         : `"${file.name}" couldn't be read as a PDF.`);
                 }
                 const pages = await merged.copyPages(pdf, pdf.getPageIndices());
@@ -425,6 +426,141 @@ function initMerge() {
             status.textContent = 'Error: ' + errorText(err);
         } finally {
             button.disabled = input.files.length < 2;
+        }
+    });
+}
+
+// =====================================================================
+// UNLOCK / REMOVE PASSWORD
+//
+// pdf-lib can't read encrypted PDFs, and restricted PDFs are always
+// encrypted, so this tool uses qpdf compiled to WebAssembly instead. It runs
+// in a worker (unlock-worker.js), loaded only when someone picks a file.
+//
+// Flow: inspect the file first. If it only has restrictions, it can be
+// decrypted straight away. If it needs a password to open, ask for it.
+// (Supplying a password to a restrictions-only file makes qpdf fail, so
+// the password box only appears when one is actually needed.)
+// =====================================================================
+
+function initUnlock() {
+    const input = byId('unlockFile');
+    const passwordRow = byId('unlockPasswordRow');
+    const passwordInput = byId('unlockPassword');
+    const button = byId('unlockBtn');
+    const status = byId('unlockStatus');
+
+    let worker = null;
+    let nextId = 1;
+    const pending = new Map();
+    let file = null;
+    let bytes = null;
+    let needsPassword = false;
+
+    function startWorker() {
+        if (worker) return;
+        worker = new Worker('/unlock-worker.js');
+        worker.onmessage = ({ data }) => {
+            const done = pending.get(data.id);
+            pending.delete(data.id);
+            if (done) done.resolve(data);
+        };
+        worker.onerror = (e) => {
+            e.preventDefault();
+            for (const done of pending.values()) done.reject(new Error('engine'));
+            pending.clear();
+            worker.terminate();
+            worker = null;
+        };
+    }
+
+    function ask(op, extra = {}) {
+        startWorker();
+        const id = nextId++;
+        return new Promise((resolve, reject) => {
+            pending.set(id, { resolve, reject });
+            // Send a copy: the original is kept for a retry with another password.
+            worker.postMessage({ id, op, bytes: bytes.slice(), ...extra });
+        });
+    }
+
+    function engineError(err) {
+        return err && err.message === 'engine'
+            ? 'Couldn\'t load the unlock engine. Check your internet connection and try again.'
+            : 'Error: ' + errorText(err);
+    }
+
+    function reset() {
+        passwordRow.style.display = 'none';
+        passwordInput.value = '';
+        button.disabled = true;
+        needsPassword = false;
+    }
+
+    input.addEventListener('change', async () => {
+        reset();
+        file = input.files[0] || null;
+        bytes = null;
+        if (!file) {
+            status.textContent = '';
+            return;
+        }
+        status.textContent = worker
+            ? 'Checking the file on your device…'
+            : 'Loading the unlock engine (about 2 MB, first time only) and checking the file on your device…';
+        try {
+            bytes = new Uint8Array(await file.arrayBuffer());
+            const info = await ask('inspect');
+            if (info.error) throw new Error(info.error);
+            if (!info.encrypted) {
+                status.textContent = 'This PDF isn\'t locked. It has no password or restrictions to remove.';
+                return;
+            }
+            needsPassword = info.needsPassword;
+            if (needsPassword) {
+                passwordRow.style.display = 'block';
+                status.textContent = 'This PDF needs a password to open. Enter it to save a copy that opens without one.';
+                passwordInput.focus();
+            } else {
+                status.textContent = 'This PDF has restrictions. Click Unlock to save a copy without them.';
+            }
+            button.disabled = false;
+        } catch (err) {
+            status.textContent = engineError(err);
+        }
+    });
+
+    passwordInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !button.disabled) button.click();
+    });
+
+    button.addEventListener('click', async () => {
+        if (!bytes) return;
+        if (needsPassword && !passwordInput.value) {
+            status.textContent = 'Enter the PDF\'s password first.';
+            passwordInput.focus();
+            return;
+        }
+        button.disabled = true;
+        status.textContent = 'Unlocking on your device…';
+        try {
+            const result = await ask('unlock', needsPassword ? { password: passwordInput.value } : {});
+            if (result.error) throw new Error(result.error);
+            if (result.ok) {
+                triggerDownload(result.bytes, file.name.replace(/\.pdf$/i, '') + '-unlocked.pdf');
+                status.textContent = needsPassword
+                    ? 'Done. The unlocked copy has downloaded and opens without a password.'
+                    : 'Done. The unlocked copy has downloaded without its restrictions.';
+            } else if (needsPassword) {
+                status.textContent = 'That password isn\'t right. Check it and try again.';
+                passwordInput.select();
+            } else {
+                status.textContent = 'This PDF couldn\'t be unlocked. It may be damaged or use an unsupported type of protection.';
+            }
+        } catch (err) {
+            status.textContent = engineError(err);
+        } finally {
+            button.disabled = !bytes;
         }
     });
 }

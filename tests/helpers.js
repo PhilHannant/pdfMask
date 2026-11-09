@@ -53,6 +53,22 @@ async function routeLocalLibs(context) {
     await context.route('**/pdf.js/3.11.174/pdf.min.js', serve('pdf.min.js'));
     await context.route('**/pdf.js/3.11.174/pdf.worker.min.js', serve('pdf.worker.min.js'));
     await context.route('**/pdf-lib@1.17.1/dist/pdf-lib.min.js', serve('pdf-lib.min.js'));
+    if (hasLocalQpdf()) {
+        await context.route('**/qpdf-wasm@*/dist/qpdf.js', serve('qpdf.js'));
+        await context.route('**/qpdf-wasm@*/dist/qpdf.wasm', route => route.fulfill({
+            body: fs.readFileSync(path.join(dir, 'qpdf.wasm')),
+            contentType: 'application/wasm',
+            headers: { 'Access-Control-Allow-Origin': '*' }
+        }));
+    }
+}
+
+// The unlock engine (qpdf.js and qpdf.wasm from qpdf-wasm) can also be
+// supplied locally. When other libraries are local but qpdf isn't, the
+// unlock tests are skipped rather than reaching for the CDN.
+function hasLocalQpdf() {
+    const dir = process.env.PDFMASK_LOCAL_LIBS;
+    return Boolean(dir) && fs.existsSync(path.join(dir, 'qpdf.js')) && fs.existsSync(path.join(dir, 'qpdf.wasm'));
 }
 
 // Every way a string can be stored in a PDF that we care about: plain bytes,
@@ -98,4 +114,4 @@ function findStrings(bytes, needles) {
     return needles.filter(n => encodings(n).some(e => layers.some(l => l.includes(e))));
 }
 
-module.exports = { startServer, routeLocalLibs, findStrings, ROOT };
+module.exports = { startServer, routeLocalLibs, hasLocalQpdf, findStrings, ROOT };

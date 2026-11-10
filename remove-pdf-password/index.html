@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Remove Password from PDF Free – No Uploads | pdfMask</title>
+    <meta name="description"
+          content="Know the password? Save a copy of your PDF that opens without it, free and entirely in your browser. Your file and password never leave your device.">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <meta name="theme-color" content="#2563eb">
+    <link rel="canonical" href="https://pdfmask.co.uk/remove-pdf-password/">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
+    <link rel="stylesheet" href="/assets/site.css">
+
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="pdfMask">
+    <meta property="og:url" content="https://pdfmask.co.uk/remove-pdf-password/">
+    <meta property="og:title" content="Remove a Password from a PDF, Without Uploading It">
+    <meta property="og:description" content="Enter the password once and save a copy that opens without it. Runs entirely in your browser.">
+    <meta property="og:image" content="https://pdfmask.co.uk/assets/og-preview.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="pdfMask – private PDF tools that run in your browser">
+    <meta property="og:locale" content="en_GB">
+    <meta name="twitter:card" content="summary_large_image">
+
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@graph": [
+            {
+                "@type": "WebApplication",
+                "@id": "https://pdfmask.co.uk/remove-pdf-password/#app",
+                "name": "pdfMask Remove PDF Password",
+                "url": "https://pdfmask.co.uk/remove-pdf-password/",
+                "description": "Free browser-based tool that removes a known password from a PDF without uploading the file or the password.",
+                "applicationCategory": "BusinessApplication",
+                "operatingSystem": "Any (web browser)",
+                "browserRequirements": "Requires JavaScript and WebAssembly",
+                "inLanguage": "en-GB",
+                "isAccessibleForFree": true,
+                "offers": { "@type": "Offer", "price": "0", "priceCurrency": "GBP" },
+                "publisher": { "@type": "Organization", "name": "pdfMask", "url": "https://pdfmask.co.uk/" }
+            },
+            {
+                "@type": "BreadcrumbList",
+                "itemListElement": [
+                    { "@type": "ListItem", "position": 1, "name": "pdfMask", "item": "https://pdfmask.co.uk/" },
+                    { "@type": "ListItem", "position": 2, "name": "Remove PDF password", "item": "https://pdfmask.co.uk/remove-pdf-password/" }
+                ]
+            },
+            {
+                "@type": "FAQPage",
+                "mainEntity": [
+                    {
+                        "@type": "Question",
+                        "name": "Can I remove a PDF password if I don't know it?",
+                        "acceptedAnswer": { "@type": "Answer", "text": "No. You need the correct password to open the file. pdfMask doesn't guess or crack passwords. If you've forgotten it, ask whoever sent you the document." }
+                    },
+                    {
+                        "@type": "Question",
+                        "name": "Is my password sent anywhere?",
+                        "acceptedAnswer": { "@type": "Answer", "text": "No. The password and the PDF stay in your browser. They're only used on your device to open the file and save an unprotected copy." }
+                    },
+                    {
+                        "@type": "Question",
+                        "name": "Does removing the password change the document?",
+                        "acceptedAnswer": { "@type": "Answer", "text": "Only the protection is removed. Text, images, links, bookmarks and form fields are kept, and your original file isn't changed." }
+                    }
+                ]
+            }
+        ]
+    }
+    </script>
+
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <script src="/app.min.js" defer></script>
+</head>
+<body>
+
+<header class="navbar">
+    <a class="nav-brand" href="/">🛡️ pdfMask</a>
+    <nav class="nav-links" aria-label="Main">
+        <a class="nav-link" href="/redact-pdf/">Redact PDF</a>
+        <a class="nav-link" href="/merge-pdf/">Merge PDFs</a>
+        <a class="nav-link" href="/unlock-pdf/">Unlock PDF</a>
+        <a class="nav-link" href="/redaction-checker/">Redaction checker</a>
+        <a class="nav-link" href="/guides/">Guides</a>
+    </nav>
+    <span class="nav-badge">🔒 Zero Server Uploads</span>
+</header>
+
+<main class="wrap">
+
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+        <ol>
+            <li><a href="/">pdfMask</a></li>
+            <li aria-current="page">Remove PDF password</li>
+        </ol>
+    </nav>
+
+    <div class="hero">
+        <h1>Remove a password from a PDF</h1>
+        <p>Tired of typing the same password every time you open a statement or payslip? Enter it once and save a copy that opens without it. Your file and your password never leave your device.</p>
+    </div>
+
+    <div class="card">
+        <h2>Remove the password</h2>
+        <p>Choose your PDF, then enter its password when asked.</p>
+        <input type="file" id="unlockFile" accept="application/pdf" aria-label="Choose a password-protected PDF">
+        <div id="unlockPasswordRow" class="password-row" style="display: none;">
+            <label for="unlockPassword">PDF password</label>
+            <input type="password" id="unlockPassword" autocomplete="off">
+        </div>
+        <div class="controls">
+            <button id="unlockBtn" class="action-btn" disabled>Unlock &amp; Download</button>
+        </div>
+        <div id="unlockStatus" class="status" role="status"></div>
+    </div>
+
+    <div class="content">
+
+        <section>
+            <h2>How to remove a PDF password</h2>
+            <ol class="steps">
+                <li>Choose the password-protected PDF above. It's opened in your browser and never uploaded.</li>
+                <li>Type the password you normally use to open it.</li>
+                <li>Click <strong>Unlock &amp; Download</strong>. A copy that opens without a password is saved with <em>-unlocked</em> added to the name.</li>
+            </ol>
+        </section>
+
+        <section>
+            <h2>When this is useful</h2>
+            <ul>
+                <li>Bank statements, payslips and pension letters that arrive protected with your date of birth or postcode.</li>
+                <li>Documents you need to merge, redact, print or upload to another service that can't open protected files.</li>
+                <li>Archiving your own files so they'll still open years from now, when the password is long forgotten.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>Keep the unlocked copy safe</h2>
+            <p>Once the password is removed, anyone who gets hold of the file can open it. Store the unlocked copy somewhere secure, and think twice before emailing it. If you only need to share part of it, <a href="/redact-pdf/">redact the details</a> you don't need to send first.</p>
+            <div class="callout">
+                <p>pdfMask can only remove a password you know. It doesn't guess or crack passwords. Only unlock documents you own or have permission to use.</p>
+            </div>
+        </section>
+
+        <section>
+            <h2>Frequently asked questions</h2>
+            <details>
+                <summary>Can I remove a PDF password if I don't know it?</summary>
+                <p>No. You need the correct password to open the file. pdfMask doesn't guess or crack passwords. If you've forgotten it, ask whoever sent you the document.</p>
+            </details>
+            <details>
+                <summary>Is my password sent anywhere?</summary>
+                <p>No. The password and the PDF stay in your browser. They're only used on your device to open the file and save an unprotected copy.</p>
+            </details>
+            <details>
+                <summary>Does removing the password change the document?</summary>
+                <p>Only the protection is removed. Text, images, links, bookmarks and form fields are kept, and your original file isn't changed.</p>
+            </details>
+            <details>
+                <summary>My PDF opens without a password but won't let me print or copy</summary>
+                <p>That's a restricted PDF rather than a password-protected one. The same tool handles it, with no password needed. See <a href="/unlock-pdf/">Unlock PDF</a>.</p>
+            </details>
+        </section>
+
+        <p class="note">Powered by <a href="https://github.com/qpdf/qpdf" rel="noopener">qpdf</a> (Apache License 2.0), compiled for the browser by <a href="https://github.com/neslinesli93/qpdf-wasm" rel="noopener">qpdf-wasm</a> (ISC licence).</p>
+
+    </div>
+</main>
+
+<footer class="site-footer">
+    <nav class="footer-links" aria-label="Footer">
+        <a href="/redact-pdf/">Redact PDF</a>
+        <a href="/merge-pdf/">Merge PDFs</a>
+        <a href="/unlock-pdf/">Unlock PDF</a>
+        <a href="/remove-pdf-password/">Remove PDF password</a>
+        <a href="/redaction-checker/">Redaction checker</a>
+        <a href="/guides/">Guides</a>
+    </nav>
+    <p>© 2026 pdfMask · Private PDF tools that run in your browser · Made in the UK</p>
+    <p>Guides on this site are general information, not legal advice.</p>
+</footer>
+
+</body>
+</html>

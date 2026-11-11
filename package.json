@@ -3,12 +3,15 @@
   "private": true,
   "description": "Private, browser-only PDF tools",
   "scripts": {
-    "build": "esbuild app.js --minify --target=es2019 --outfile=app.min.js",
+    "vendor": "node scripts/vendor.js",
+    "build": "node scripts/vendor.js && esbuild app.js --minify --target=es2019 --outfile=app.min.js",
     "test": "node --test \"tests/*.test.js\""
   },
   "devDependencies": {
+    "@neslinesli93/qpdf-wasm": "0.3.0",
     "esbuild": "0.28.2",
     "pdf-lib": "1.17.1",
+    "pdfjs-dist": "3.11.174",
     "playwright": "^1.63.0"
   }
 }

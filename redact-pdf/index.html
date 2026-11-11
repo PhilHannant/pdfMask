@@ -10,7 +10,7 @@
     <meta name="robots" content="index, follow, max-image-preview:large">
     <meta name="theme-color" content="#2563eb">
     <link rel="canonical" href="https://pdfmask.co.uk/redact-pdf/">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
+    <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="/assets/site.css">
 
     <meta property="og:type" content="website">
@@ -85,10 +85,8 @@
     }
     </script>
 
-    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
-    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js" defer></script>
+    <script src="/vendor/pdfjs-3.11.174/pdf.min.js" defer></script>
+    <script src="/vendor/pdf-lib-1.17.1/pdf-lib.min.js" defer></script>
     <script src="/app.min.js" defer></script>
 </head>
 <body>
@@ -102,7 +100,7 @@
         <a class="nav-link" href="/redaction-checker/">Redaction checker</a>
         <a class="nav-link" href="/guides/">Guides</a>
     </nav>
-    <span class="nav-badge">🔒 Zero Server Uploads</span>
+    <a class="nav-badge" href="/security/">🔒 Zero Server Uploads</a>
 </header>
 
 <main class="wrap">
@@ -125,13 +123,13 @@
 
         <input type="file" id="pdfFile" accept="application/pdf" aria-label="Choose a PDF to redact">
 
-        <div id="page-nav" class="page-nav" style="display: none;">
+        <div id="page-nav" class="page-nav" hidden>
             <button id="prevPage" class="secondary-btn" disabled aria-label="Previous page">‹ Prev</button>
             <span id="pageInfo" class="page-info" aria-live="polite"></span>
             <button id="nextPage" class="secondary-btn" disabled aria-label="Next page">Next ›</button>
         </div>
 
-        <div id="canvas-wrapper" style="display: none;">
+        <div id="canvas-wrapper" hidden>
             <canvas id="pdf-canvas"></canvas>
             <canvas id="selection-canvas"></canvas>
         </div>
@@ -234,6 +232,12 @@
         <a href="/remove-pdf-password/">Remove PDF password</a>
         <a href="/redaction-checker/">Redaction checker</a>
         <a href="/guides/">Guides</a>
+    </nav>
+    <nav class="footer-links" aria-label="About this site">
+        <a href="/about/">About</a>
+        <a href="/security/">Security</a>
+        <a href="/privacy/">Privacy</a>
+        <a href="/about/#contact">Contact</a>
     </nav>
     <p>© 2026 pdfMask · Private PDF tools that run in your browser · Made in the UK</p>
     <p>Guides on this site are general information, not legal advice.</p>

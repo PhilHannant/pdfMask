@@ -7,10 +7,17 @@
 //
 // Each qpdf command runs in a fresh qpdf instance, so one run can never
 // affect the next.
+//
+// qpdf is served from this site (vendor/, copied from the pinned qpdf-wasm
+// npm package at build time), not from another server.
 
-const QPDF_WASM = 'https://cdn.jsdelivr.net/npm/@neslinesli93/qpdf-wasm@0.3.0/dist/';
+const QPDF_WASM = '/vendor/qpdf-wasm-0.3.0/';
 
 importScripts(QPDF_WASM + 'qpdf.js');
+
+// Load qpdf once now, while the page is loading. That puts it in the
+// browser's cache, so later runs need no network at all.
+Module({ locateFile: () => QPDF_WASM + 'qpdf.wasm', noInitialRun: true }).catch(() => {});
 
 async function qpdf(args, input) {
     const instance = await Module({

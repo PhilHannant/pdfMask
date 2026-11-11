@@ -1,11 +1,14 @@
-// Shared helpers for the browser tests: a static server for the site, an
-// optional route that swaps the CDN libraries for local copies (for offline
-// runs), and a scanner that looks for text anywhere inside a PDF's bytes.
+// Shared helpers for the tests: a static server that behaves like Cloudflare
+// (including the _headers file, so pages run under the real security policy),
+// a page opener that records anything that shouldn't happen, and a scanner
+// that looks for text anywhere inside a PDF's bytes.
 
 const http = require('node:http');
 const fs = require('node:fs');
 const path = require('node:path');
 const zlib = require('node:zlib');
+
+const { vendorPaths } = require('../scripts/vendor');
 
 const ROOT = path.resolve(__dirname, '..');
 
@@ -14,23 +17,71 @@ const MIME = {
     '.js': 'text/javascript',
     '.css': 'text/css',
     '.png': 'image/png',
+    '.svg': 'image/svg+xml',
+    '.wasm': 'application/wasm',
     '.xml': 'application/xml',
     '.txt': 'text/plain',
     '.pdf': 'application/pdf'
 };
 
+// ---------------------------------------------------------------------------
+// _headers, as Cloudflare applies it to static assets:
+// https://developers.cloudflare.com/workers/static-assets/headers/
+// A block is a path (exact, or with one * splat) followed by indented
+// "Name: value" lines. Every matching block applies, in order. A header set
+// by more than one block has its values joined with a comma. "! Name" removes
+// a header set by an earlier block.
+// ---------------------------------------------------------------------------
+
+function parseHeadersFile(text = fs.readFileSync(path.join(ROOT, '_headers'), 'utf8')) {
+    const rules = [];
+    let current = null;
+    for (const raw of text.split('\n')) {
+        if (!raw.trim() || raw.trim().startsWith('#')) continue;
+        if (!/^\s/.test(raw)) {
+            current = { path: raw.trim(), set: [], unset: [] };
+            rules.push(current);
+        } else if (raw.trim().startsWith('!')) {
+            current.unset.push(raw.trim().slice(1).trim().toLowerCase());
+        } else {
+            const at = raw.indexOf(':');
+            current.set.push([raw.slice(0, at).trim().toLowerCase(), raw.slice(at + 1).trim()]);
+        }
+    }
+    return rules;
+}
+
+function ruleMatches(rulePath, urlPath) {
+    if (!rulePath.includes('*')) return rulePath === urlPath;
+    const [before, after] = rulePath.split('*');
+    return urlPath.length >= before.length + after.length && urlPath.startsWith(before) && urlPath.endsWith(after);
+}
+
+function headersFor(urlPath, rules = parseHeadersFile()) {
+    const headers = {};
+    for (const rule of rules.filter(r => ruleMatches(r.path, urlPath))) {
+        for (const name of rule.unset) delete headers[name];
+        for (const [name, value] of rule.set) {
+            headers[name] = name in headers ? `${headers[name]}, ${value}` : value;
+        }
+    }
+    return headers;
+}
+
 function startServer() {
+    const rules = parseHeadersFile();
     const server = http.createServer((req, res) => {
         const urlPath = decodeURIComponent(new URL(req.url, 'http://x').pathname);
+        const extra = headersFor(urlPath, rules);
         // Same rules as Cloudflare's static assets: /page/ serves page/index.html.
         let file = path.join(ROOT, urlPath);
         if (urlPath.endsWith('/')) file = path.join(file, 'index.html');
         if (!file.startsWith(ROOT) || !fs.existsSync(file) || fs.statSync(file).isDirectory()) {
-            res.writeHead(404, { 'Content-Type': MIME['.html'] });
+            res.writeHead(404, { ...extra, 'Content-Type': MIME['.html'] });
             fs.createReadStream(path.join(ROOT, '404.html')).on('error', () => res.end()).pipe(res);
             return;
         }
-        res.writeHead(200, { 'Content-Type': MIME[path.extname(file)] || 'application/octet-stream' });
+        res.writeHead(200, { ...extra, 'Content-Type': MIME[path.extname(file)] || 'application/octet-stream' });
         fs.createReadStream(file).pipe(res);
     });
     return new Promise(resolve => {
@@ -40,36 +91,36 @@ function startServer() {
     });
 }
 
-// Set PDFMASK_LOCAL_LIBS to a folder containing pdf.min.js, pdf.worker.min.js
-// and pdf-lib.min.js to run without reaching the CDNs. CI uses the real CDNs.
-async function routeLocalLibs(context) {
-    const dir = process.env.PDFMASK_LOCAL_LIBS;
-    if (!dir) return;
-    const serve = name => route => route.fulfill({
-        body: fs.readFileSync(path.join(dir, name)),
-        contentType: 'text/javascript',
-        headers: { 'Access-Control-Allow-Origin': '*' }
+// Open a page and record everything that would mean the site misbehaved:
+// script errors, anything the security policy had to block, and any request
+// to a server other than the site itself. Tests assert `problems` is empty.
+async function openPage(browser, url, options = {}) {
+    const context = await browser.newContext({ viewport: { width: 1280, height: 1000 }, ...options });
+    const page = await context.newPage();
+    const problems = [];
+    const origin = new URL(url).origin;
+    page.on('pageerror', e => problems.push(`script error: ${e.message}`));
+    page.on('console', m => {
+        if (m.type() === 'error') problems.push(`console error: ${m.text()}`);
     });
-    await context.route('**/pdf.js/3.11.174/pdf.min.js', serve('pdf.min.js'));
-    await context.route('**/pdf.js/3.11.174/pdf.worker.min.js', serve('pdf.worker.min.js'));
-    await context.route('**/pdf-lib@1.17.1/dist/pdf-lib.min.js', serve('pdf-lib.min.js'));
-    if (hasLocalQpdf()) {
-        await context.route('**/qpdf-wasm@*/dist/qpdf.js', serve('qpdf.js'));
-        await context.route('**/qpdf-wasm@*/dist/qpdf.wasm', route => route.fulfill({
-            body: fs.readFileSync(path.join(dir, 'qpdf.wasm')),
-            contentType: 'application/wasm',
-            headers: { 'Access-Control-Allow-Origin': '*' }
-        }));
-    }
+    context.on('request', r => {
+        const target = r.url();
+        if (!target.startsWith(origin + '/') && !/^(blob|data):/.test(target)) {
+            problems.push(`request to another server: ${target}`);
+        }
+    });
+    await page.addInitScript(() => {
+        document.addEventListener('securitypolicyviolation', e => {
+            console.error(`security policy blocked ${e.blockedURI || 'inline code'} (${e.violatedDirective})`);
+        });
+    });
+    await page.goto(url, { waitUntil: 'networkidle' });
+    return { page, context, problems };
 }
 
-// The unlock engine (qpdf.js and qpdf.wasm from qpdf-wasm) can also be
-// supplied locally. When other libraries are local but qpdf isn't, the
-// unlock tests are skipped rather than reaching for the CDN.
-function hasLocalQpdf() {
-    const dir = process.env.PDFMASK_LOCAL_LIBS;
-    return Boolean(dir) && fs.existsSync(path.join(dir, 'qpdf.js')) && fs.existsSync(path.join(dir, 'qpdf.wasm'));
-}
+// vendor/ is built from npm packages (npm run build). The unlock engine isn't
+// available everywhere the tests run, so tests that need it check first.
+const hasVendored = (pkg, file) => fs.existsSync(path.join(ROOT, vendorPaths()[pkg], file));
 
 // Every way a string can be stored in a PDF that we care about: plain bytes,
 // UTF-16BE (pdf-lib writes metadata and form values this way), and both of
@@ -114,4 +165,4 @@ function findStrings(bytes, needles) {
     return needles.filter(n => encodings(n).some(e => layers.some(l => l.includes(e))));
 }
 
-module.exports = { startServer, routeLocalLibs, hasLocalQpdf, findStrings, ROOT };
+module.exports = { startServer, openPage, hasVendored, parseHeadersFile, headersFor, findStrings, ROOT };

@@ -12,7 +12,7 @@ const os = require('node:os');
 const path = require('node:path');
 const { chromium } = require('playwright');
 const { PDFDocument, StandardFonts, PDFName, degrees } = require('pdf-lib');
-const { startServer, routeLocalLibs, findStrings, ROOT } = require('./helpers');
+const { startServer, openPage, findStrings, ROOT } = require('./helpers');
 
 const SECRETS = {
     text: 'SECRET-ACCOUNT-12345678',
@@ -83,14 +83,9 @@ async function buildFixture() {
 async function openRedactor(file) {
     // Tall enough that every box we draw is on screen whatever fonts the
     // machine has: mouse events outside the window are never delivered.
-    const context = await browser.newContext({ viewport: { width: 1280, height: 1800 }, acceptDownloads: true });
-    await routeLocalLibs(context);
-    const page = await context.newPage();
-    const errors = [];
-    page.on('pageerror', e => errors.push(e.message));
-    await page.goto(baseUrl + 'redact-pdf/', { waitUntil: 'networkidle' });
-    await page.setInputFiles('#pdfFile', file);
-    return { page, context, errors };
+    const opened = await openPage(browser, baseUrl + 'redact-pdf/', { viewport: { width: 1280, height: 1800 }, acceptDownloads: true });
+    await opened.page.setInputFiles('#pdfFile', file);
+    return opened;
 }
 
 async function drawBox(page, b) {
@@ -116,7 +111,7 @@ async function goToPage(page, n) {
 // Ask the page's own pdf.js for each page's text and displayed size.
 async function inspectPdf(page, bytes) {
     return page.evaluate(async data => {
-        const doc = await pdfjsLib.getDocument({ data: new Uint8Array(data) }).promise;
+        const doc = await openPdf(new Uint8Array(data));
         const pages = [];
         for (let i = 1; i <= doc.numPages; i++) {
             const p = await doc.getPage(i);
@@ -150,7 +145,7 @@ test('fixture really contains every secret (so the scanner is trustworthy)', () 
 });
 
 test('redacted content is removed from the file, everything else survives', async () => {
-    const { page, context, errors } = await openRedactor(fixture);
+    const { page, context, problems } = await openRedactor(fixture);
     await page.waitForFunction(() => document.getElementById('pageInfo').textContent.includes('Page 1 of 3'));
 
     for (const b of boxes[1]) await drawBox(page, b);
@@ -186,7 +181,7 @@ test('redacted content is removed from the file, everything else survives', asyn
     // the heading is no longer text, but it is still in the image. Check
     // that the top of page 1 is not blank.
     const headingInk = await page.evaluate(async data => {
-        const doc = await pdfjsLib.getDocument({ data: new Uint8Array(data) }).promise;
+        const doc = await openPdf(new Uint8Array(data));
         const p = await doc.getPage(1);
         const vp = p.getViewport({ scale: 1 });
         const c = document.createElement('canvas');
@@ -208,7 +203,7 @@ test('redacted content is removed from the file, everything else survives', asyn
     assert.match(await page.getAttribute('#checkResults .verdict', 'class'), /\bok\b/,
         await page.textContent('#checkResults'));
 
-    assert.deepEqual(errors, []);
+    assert.deepEqual(problems, []);
     await context.close();
 });
 

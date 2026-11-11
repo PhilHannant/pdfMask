@@ -1,0 +1,77 @@
+# Security headers for pdfmask.co.uk, applied by Cloudflare to every response.
+#
+# The Content-Security-Policy tells the browser what each page may load and
+# where it may connect. Pages that open your files get the strictest policy:
+# scripts only from this site, and no connections to any other server.
+#
+# When a request matches more than one rule, Cloudflare joins the values and
+# the browser enforces every policy at once. So the /* fallback is written as
+# a superset: each page's own policy below only ever narrows it. If you add a
+# page, give it a rule here; tests/site.test.js checks every page has one.
+
+# Fallback for anything without its own rule (including the 404 page).
+/*
+  Content-Security-Policy: default-src 'none'; script-src 'self' 'wasm-unsafe-eval' https://static.cloudflareinsights.com; style-src 'self'; img-src 'self'; connect-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()
+  Cross-Origin-Opener-Policy: same-origin
+
+# ---------------------------------------------------------------------------
+# Tool pages: these open your files.
+# Scripts come only from this site. connect-src 'none' means the page cannot
+# send anything anywhere, not even back to pdfmask.co.uk.
+# ---------------------------------------------------------------------------
+
+/redact-pdf/
+  Content-Security-Policy: default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'none'; worker-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
+
+/redaction-checker/
+  Content-Security-Policy: default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'none'; worker-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
+
+/merge-pdf/
+  Content-Security-Policy: default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'none'; worker-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
+
+# Unlock runs qpdf as WebAssembly, which needs 'wasm-unsafe-eval' to start and
+# connect-src 'self' to fetch the qpdf file from this site. It still cannot
+# connect to any other server.
+/unlock-pdf/
+  Content-Security-Policy: default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self'; img-src 'self'; connect-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
+
+/remove-pdf-password/
+  Content-Security-Policy: default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self'; img-src 'self'; connect-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
+
+# Background workers take their policy from their own script's headers.
+/vendor/pdfjs-3.11.174/pdf.worker.min.js
+  Content-Security-Policy: default-src 'none'; script-src 'self'; connect-src 'none'
+
+/unlock-worker.js
+  Content-Security-Policy: default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; connect-src 'self'
+
+# The libraries live in folders named after their exact version, so their
+# addresses change whenever they do and browsers can keep them for a year.
+# This is also what lets the tools work offline once a page has loaded.
+/vendor/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# ---------------------------------------------------------------------------
+# Information pages: these never open a file.
+# They allow Cloudflare Web Analytics, a cookieless page-view counter that
+# Cloudflare adds to the page. It reports to this site's own /cdn-cgi/rum.
+# ---------------------------------------------------------------------------
+
+/
+  Content-Security-Policy: default-src 'none'; script-src 'self' https://static.cloudflareinsights.com; style-src 'self'; img-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
+
+/guides/*
+  Content-Security-Policy: default-src 'none'; script-src 'self' https://static.cloudflareinsights.com; style-src 'self'; img-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
+
+/about/
+  Content-Security-Policy: default-src 'none'; script-src 'self' https://static.cloudflareinsights.com; style-src 'self'; img-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
+
+/security/
+  Content-Security-Policy: default-src 'none'; script-src 'self' https://static.cloudflareinsights.com; style-src 'self'; img-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
+
+/privacy/
+  Content-Security-Policy: default-src 'none'; script-src 'self' https://static.cloudflareinsights.com; style-src 'self'; img-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'

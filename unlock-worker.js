@@ -13,6 +13,11 @@
 
 const QPDF_WASM = '/vendor/qpdf-wasm-0.3.0/';
 
+// qpdf reports things like "invalid password" by writing to the console.
+// Those are expected outcomes, handled below, so they are kept out of the
+// browser's console. This must be set before qpdf loads.
+console.error = console.warn = () => {};
+
 importScripts(QPDF_WASM + 'qpdf.js');
 
 // Load qpdf once now, while the page is loading. That puts it in the

@@ -3,12 +3,28 @@
 //
 // One script serves every page. Each tool starts only if its controls are on
 // the current page, so pages without a tool don't need the PDF libraries.
+//
+// The libraries are served from this site (vendor/, copied from pinned npm
+// packages at build time), never from another server. The site's security
+// policy (_headers) also stops these pages connecting anywhere else.
 
-const PDFJS_WORKER = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-
-if (window.pdfjsLib) pdfjsLib.GlobalWorkerOptions.workerSrc = PDFJS_WORKER;
+// pdf.js does its parsing in a background worker. Starting it with the page,
+// not on first use, means nothing has to be fetched once you choose a file,
+// so the tools keep working even with the network switched off.
+let pdfWorker = null;
+if (window.pdfjsLib) {
+    pdfjsLib.GlobalWorkerOptions.workerSrc = '/vendor/pdfjs-3.11.174/pdf.worker.min.js';
+    pdfWorker = new pdfjsLib.PDFWorker();
+}
 
 const byId = id => document.getElementById(id);
+
+// Every PDF is opened through here. isEvalSupported is switched off because
+// pdf.js before 4.2.67 can be tricked by a malicious PDF into running code
+// when it is on (CVE-2024-4367). The security policy blocks eval as well.
+function openPdf(data) {
+    return pdfjsLib.getDocument({ data, worker: pdfWorker, isEvalSupported: false }).promise;
+}
 
 if (byId('pdfFile')) initRedactor();
 if (byId('mergeFiles')) initMerge();
@@ -82,7 +98,7 @@ function initRedactor() {
         try {
             rawArrayBuffer = await file.arrayBuffer();
             // pdf.js may transfer the buffer it is given, so pass a copy.
-            pdfJsDoc = await pdfjsLib.getDocument({ data: rawArrayBuffer.slice(0) }).promise;
+            pdfJsDoc = await openPdf(rawArrayBuffer.slice(0));
         } catch (err) {
             rawArrayBuffer = null;
             statusDiv.textContent = err && err.name === 'PasswordException'
@@ -91,8 +107,8 @@ function initRedactor() {
             return;
         }
 
-        wrapper.style.display = 'inline-block';
-        pageNav.style.display = 'flex';
+        wrapper.hidden = false;
+        pageNav.hidden = false;
         await showPage(1);
         statusDiv.textContent = 'Click and drag over anything you want to remove. You can mark several areas on any page.';
     });
@@ -435,7 +451,8 @@ function initMerge() {
 //
 // pdf-lib can't read encrypted PDFs, and restricted PDFs are always
 // encrypted, so this tool uses qpdf compiled to WebAssembly instead. It runs
-// in a worker (unlock-worker.js), loaded only when someone picks a file.
+// in a worker (unlock-worker.js), which starts with the page and loads qpdf
+// straight away, so nothing needs fetching once you choose a file.
 //
 // Flow: inspect the file first. If it only has restrictions, it can be
 // decrypted straight away. If it needs a password to open, ask for it.
@@ -486,12 +503,14 @@ function initUnlock() {
 
     function engineError(err) {
         return err && err.message === 'engine'
-            ? 'Couldn\'t load the unlock engine. Check your internet connection and try again.'
+            ? 'Couldn\'t load the unlock engine. Reload the page and try again.'
             : 'Error: ' + errorText(err);
     }
 
+    startWorker();
+
     function reset() {
-        passwordRow.style.display = 'none';
+        passwordRow.hidden = true;
         passwordInput.value = '';
         button.disabled = true;
         needsPassword = false;
@@ -505,9 +524,7 @@ function initUnlock() {
             status.textContent = '';
             return;
         }
-        status.textContent = worker
-            ? 'Checking the file on your device…'
-            : 'Loading the unlock engine (about 2 MB, first time only) and checking the file on your device…';
+        status.textContent = 'Checking the file on your device…';
         try {
             bytes = new Uint8Array(await file.arrayBuffer());
             const info = await ask('inspect');
@@ -522,7 +539,7 @@ function initUnlock() {
             }
             needsPassword = info.needsPassword;
             if (needsPassword) {
-                passwordRow.style.display = 'block';
+                passwordRow.hidden = false;
                 status.textContent = 'This PDF needs a password to open. Enter it to save a copy that opens without one.';
                 passwordInput.focus();
             } else {
@@ -601,7 +618,7 @@ function initChecker() {
         let bytes;
         try {
             bytes = new Uint8Array(await file.arrayBuffer());
-            doc = await pdfjsLib.getDocument({ data: bytes.slice() }).promise;
+            doc = await openPdf(bytes.slice());
         } catch (err) {
             status.textContent = err && err.name === 'PasswordException'
                 ? 'This PDF needs a password to open, so it can\'t be checked.'

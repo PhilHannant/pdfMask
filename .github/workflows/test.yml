@@ -18,8 +18,9 @@ jobs:
       - name: Install dependencies
         run: npm install --no-audit --no-fund
 
-      # Test the code as Cloudflare will deploy it: built fresh from app.js.
-      - name: Build app.min.js
+      # Test the site as Cloudflare will deploy it: libraries copied into
+      # vendor/ from the pinned npm packages, and app.min.js built from app.js.
+      - name: Build
         run: npm run build
 
       - name: Install Chromium

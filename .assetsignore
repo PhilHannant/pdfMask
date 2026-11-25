@@ -5,6 +5,7 @@
 .assetsignore
 node_modules
 tests
+scripts
 package.json
 package-lock.json
 wrangler.jsonc

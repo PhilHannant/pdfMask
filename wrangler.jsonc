@@ -1,6 +1,13 @@
 {
   "name": "pdfmask",
   "compatibility_date": "2026-10-16",
+  // Build the site before every deploy: copy the libraries into vendor/ and
+  // minify app.js. The tools can't load without vendor/, so if this step
+  // can't run, the deploy fails and the current site stays up, which is
+  // better than publishing a broken one.
+  "build": {
+    "command": "npm run build"
+  },
   "assets": {
     "directory": "./",
     // /redact-pdf/ serves redact-pdf/index.html, and /redact-pdf redirects to /redact-pdf/.

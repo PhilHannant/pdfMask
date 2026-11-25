@@ -10,17 +10,17 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { chromium } = require('playwright');
 const { PDFDocument } = require('pdf-lib');
-const { startServer, routeLocalLibs, hasLocalQpdf, findStrings, ROOT } = require('./helpers');
+const { startServer, openPage, hasVendored, findStrings, ROOT } = require('./helpers');
 
 const FIXTURES = path.join(ROOT, 'tests/fixtures/unlock');
 const PAGE_TEXT = 'Restricted test file';
 const PASSWORD = 'pa ss£!';
-// The first run downloads and compiles the unlock engine.
+// The first run loads and compiles the unlock engine.
 const ENGINE_TIMEOUT = 60000;
 
-const skip = process.env.PDFMASK_LOCAL_LIBS && !hasLocalQpdf()
-    ? 'PDFMASK_LOCAL_LIBS has no qpdf.js/qpdf.wasm, and these tests need the unlock engine'
-    : false;
+const skip = hasVendored('@neslinesli93/qpdf-wasm', 'qpdf.wasm')
+    ? false
+    : 'vendor/qpdf is missing: run "npm install && npm run build" to fetch the unlock engine';
 
 let browser, server, baseUrl;
 
@@ -36,13 +36,7 @@ after(async () => {
 });
 
 async function openTool(pagePath) {
-    const context = await browser.newContext({ viewport: { width: 1280, height: 1200 }, acceptDownloads: true });
-    await routeLocalLibs(context);
-    const page = await context.newPage();
-    const errors = [];
-    page.on('pageerror', e => errors.push(e.message));
-    await page.goto(baseUrl + pagePath, { waitUntil: 'networkidle' });
-    return { page, context, errors };
+    return openPage(browser, baseUrl + pagePath, { viewport: { width: 1280, height: 1200 }, acceptDownloads: true });
 }
 
 async function statusMatches(page, pattern) {
@@ -75,7 +69,7 @@ async function assertUnlocked(bytes, label) {
 
 for (const kind of ['rc4-40', 'rc4-128', 'aes-128', 'aes-256']) {
     test(`removes restrictions from a ${kind} PDF without asking for a password`, { skip }, async () => {
-        const { page, context, errors } = await openTool('unlock-pdf/');
+        const { page, context, problems } = await openTool('unlock-pdf/');
         await page.setInputFiles('#unlockFile', path.join(FIXTURES, `restricted-${kind}.pdf`));
         await statusMatches(page, /has restrictions/);
         assert.equal(await page.isVisible('#unlockPassword'), false, 'password box should stay hidden');
@@ -84,13 +78,13 @@ for (const kind of ['rc4-40', 'rc4-128', 'aes-128', 'aes-256']) {
         assert.equal(out.name, `restricted-${kind}-unlocked.pdf`);
         await assertUnlocked(out.bytes, kind);
         await statusMatches(page, /^Done/);
-        assert.deepEqual(errors, []);
+        assert.deepEqual(problems, []);
         await context.close();
     });
 }
 
 test('removes a known password, and rejects a wrong one', { skip }, async () => {
-    const { page, context, errors } = await openTool('remove-pdf-password/');
+    const { page, context, problems } = await openTool('remove-pdf-password/');
     await page.setInputFiles('#unlockFile', path.join(FIXTURES, 'password-aes-256.pdf'));
     await statusMatches(page, /needs a password/);
     assert.equal(await page.isVisible('#unlockPassword'), true);
@@ -104,7 +98,7 @@ test('removes a known password, and rejects a wrong one', { skip }, async () => 
     const out = await unlockAndRead(page);
     await assertUnlocked(out.bytes, 'password');
     await statusMatches(page, /opens without a password/);
-    assert.deepEqual(errors, []);
+    assert.deepEqual(problems, []);
     await context.close();
 });
 

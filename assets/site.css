@@ -20,6 +20,10 @@
 
 * { box-sizing: border-box; }
 
+/* The hidden attribute must win over display rules set on ids and classes.
+   (Inline style attributes aren't used: the security policy blocks them.) */
+[hidden] { display: none !important; }
+
 body {
     font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
     margin: 0;
@@ -78,7 +82,9 @@ a:hover { color: var(--primary-hover); }
     font-size: 12px;
     font-weight: 600;
     white-space: nowrap;
+    text-decoration: none;
 }
+a.nav-badge:hover { color: var(--ok-text); text-decoration: underline; }
 
 /* ---------- Page layout ---------- */
 
@@ -227,6 +233,9 @@ input[type="file"] { margin: 15px 0; display: block; max-width: 100%; }
 .prose { max-width: 720px; }
 .prose h2 { margin-top: 40px; }
 .prose section:first-child h2 { margin-top: 0; }
+.prose h3 { margin-top: 28px; }
+.prose h2 + h3 { margin-top: 0; }
+code { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 0.92em; background: #eef2f7; padding: 1px 5px; border-radius: 4px; }
 
 .callout {
     background: #eff6ff;

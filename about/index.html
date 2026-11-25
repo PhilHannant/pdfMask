@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>About pdfMask: Who Runs It and How to Get in Touch</title>
+    <meta name="description"
+          content="pdfMask is built and run by Phil Hannant in the UK. Who's behind the site, why it exists, the open-source libraries it uses, and how to get in touch.">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <meta name="theme-color" content="#2563eb">
+    <link rel="canonical" href="https://pdfmask.co.uk/about/">
+    <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="/assets/site.css">
+
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="pdfMask">
+    <meta property="og:url" content="https://pdfmask.co.uk/about/">
+    <meta property="og:title" content="About pdfMask">
+    <meta property="og:description" content="Who builds and runs pdfMask, why it exists, and how to get in touch.">
+    <meta property="og:image" content="https://pdfmask.co.uk/assets/og-preview.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="pdfMask – private PDF tools that run in your browser">
+    <meta property="og:locale" content="en_GB">
+    <meta name="twitter:card" content="summary_large_image">
+
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@graph": [
+            {
+                "@type": "AboutPage",
+                "url": "https://pdfmask.co.uk/about/",
+                "name": "About pdfMask",
+                "inLanguage": "en-GB",
+                "mainEntity": {
+                    "@type": "Person",
+                    "name": "Phil Hannant",
+                    "url": "https://github.com/PhilHannant",
+                    "email": "hello@pdfmask.co.uk"
+                }
+            },
+            {
+                "@type": "BreadcrumbList",
+                "itemListElement": [
+                    { "@type": "ListItem", "position": 1, "name": "pdfMask", "item": "https://pdfmask.co.uk/" },
+                    { "@type": "ListItem", "position": 2, "name": "About", "item": "https://pdfmask.co.uk/about/" }
+                ]
+            }
+        ]
+    }
+    </script>
+</head>
+<body>
+
+<header class="navbar">
+    <a class="nav-brand" href="/">🛡️ pdfMask</a>
+    <nav class="nav-links" aria-label="Main">
+        <a class="nav-link" href="/redact-pdf/">Redact PDF</a>
+        <a class="nav-link" href="/merge-pdf/">Merge PDFs</a>
+        <a class="nav-link" href="/unlock-pdf/">Unlock PDF</a>
+        <a class="nav-link" href="/redaction-checker/">Redaction checker</a>
+        <a class="nav-link" href="/guides/">Guides</a>
+    </nav>
+    <a class="nav-badge" href="/security/">🔒 Zero Server Uploads</a>
+</header>
+
+<main class="wrap">
+
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+        <ol>
+            <li><a href="/">pdfMask</a></li>
+            <li aria-current="page">About</li>
+        </ol>
+    </nav>
+
+    <div class="content prose">
+        <div class="hero">
+            <h1>About pdfMask</h1>
+            <p>Free PDF tools that do their work in your browser, so your documents never leave your device. Built and run by one person in the UK.</p>
+        </div>
+
+        <section>
+            <h2>Who's behind it</h2>
+            <p>I'm Phil Hannant, and I build and run pdfMask. There's no support desk or team in between: if you email, you reach me.</p>
+            <p>The site's code is public on <a href="https://github.com/PhilHannant/pdfMask" rel="noopener">GitHub</a>, so anyone can read exactly what it does with a file.</p>
+        </section>
+
+        <section>
+            <h2>Why it exists</h2>
+            <p>Most online PDF tools work by uploading your document to their servers. That's a lot to ask when the document is a contract, a bank statement or a client's case file.</p>
+            <p>pdfMask takes the other approach. The tools load into your browser and do everything there. Nothing you open is uploaded, stored or logged, and the <a href="/security/">security page</a> explains how you can check that for yourself.</p>
+            <p>It also takes redaction seriously. Drawing a black box over text doesn't remove it, and that mistake keeps exposing confidential details. The <a href="/redact-pdf/">redactor</a> removes the content itself, and the <a href="/redaction-checker/">redaction checker</a> finds text still hiding in files redacted elsewhere.</p>
+        </section>
+
+        <section>
+            <h2>What it costs</h2>
+            <p>The tools are free to use, with no sign-up, no adverts and no watermarks.</p>
+        </section>
+
+        <section id="contact">
+            <h2>Contact</h2>
+            <p>Questions, problems and suggestions are all welcome: <a href="mailto:hello@pdfmask.co.uk">hello@pdfmask.co.uk</a>.</p>
+            <p>Please don't email confidential documents. If a file isn't working, describe what happens, or send a sample with made-up details.</p>
+        </section>
+
+        <section>
+            <h2>Open-source software pdfMask uses</h2>
+            <p>pdfMask is built on these open-source libraries, with thanks to the people who maintain them. Each is served from pdfmask.co.uk at a fixed version.</p>
+            <ul>
+                <li><a href="https://github.com/mozilla/pdf.js" rel="noopener">PDF.js</a> by Mozilla, for reading and displaying PDFs (Apache License 2.0)</li>
+                <li><a href="https://github.com/Hopding/pdf-lib" rel="noopener">pdf-lib</a>, for building and merging PDFs (MIT licence)</li>
+                <li><a href="https://github.com/qpdf/qpdf" rel="noopener">qpdf</a>, for unlocking PDFs (Apache License 2.0), compiled for the browser by <a href="https://github.com/neslinesli93/qpdf-wasm" rel="noopener">qpdf-wasm</a> (ISC licence)</li>
+            </ul>
+        </section>
+    </div>
+</main>
+
+<footer class="site-footer">
+    <nav class="footer-links" aria-label="Footer">
+        <a href="/redact-pdf/">Redact PDF</a>
+        <a href="/merge-pdf/">Merge PDFs</a>
+        <a href="/unlock-pdf/">Unlock PDF</a>
+        <a href="/remove-pdf-password/">Remove PDF password</a>
+        <a href="/redaction-checker/">Redaction checker</a>
+        <a href="/guides/">Guides</a>
+    </nav>
+    <nav class="footer-links" aria-label="About this site">
+        <a href="/about/">About</a>
+        <a href="/security/">Security</a>
+        <a href="/privacy/">Privacy</a>
+        <a href="/about/#contact">Contact</a>
+    </nav>
+    <p>© 2026 pdfMask · Private PDF tools that run in your browser · Made in the UK</p>
+    <p>Guides on this site are general information, not legal advice.</p>
+</footer>
+
+</body>
+</html>

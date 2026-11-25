@@ -17,7 +17,7 @@ const {
     pushGraphicsState, popGraphicsState, beginText, endText, setFontAndSize,
     moveText, showText, setTextRenderingMode, TextRenderingMode
 } = require('pdf-lib');
-const { startServer, routeLocalLibs } = require('./helpers');
+const { startServer, openPage, ROOT } = require('./helpers');
 
 const MUST_FIND = [
     'BLACKBOX-SECRET-111', 'WHITEBOX-SECRET-222', 'INVISIBLE-SECRET-333', 'IMAGE-COVERED-444',
@@ -147,19 +147,14 @@ function appendIncrementalUpdate(bytes) {
 }
 
 async function check(file) {
-    const context = await browser.newContext({ viewport: { width: 1280, height: 1000 } });
-    await routeLocalLibs(context);
-    const page = await context.newPage();
-    const errors = [];
-    page.on('pageerror', e => errors.push(e.message));
-    await page.goto(baseUrl + 'redaction-checker/', { waitUntil: 'networkidle' });
+    const { page, context, problems } = await openPage(browser, baseUrl + 'redaction-checker/');
     await page.setInputFiles('#checkFile', file);
     await page.waitForSelector('#checkResults .verdict', { timeout: 30000 });
     const result = {
         verdict: await page.getAttribute('#checkResults .verdict', 'class'),
         text: await page.textContent('#checkResults'),
         leaks: await page.$$eval('#checkResults .leak', els => els.map(e => e.textContent)),
-        errors
+        problems
     };
     await context.close();
     return result;
@@ -192,7 +187,7 @@ test('finds every hidden secret and nothing else', async () => {
     assert.match(r.text, /edited and saved 2 times/);
     assert.match(r.text, /Title: "Case file - Mr J Smith"/);
     assert.match(r.text, /notes\.txt/);
-    assert.deepEqual(r.errors, []);
+    assert.deepEqual(r.problems, []);
 });
 
 test('a clean document passes', async () => {
@@ -204,5 +199,16 @@ test('a clean document passes', async () => {
     const r = await check(file);
     assert.match(r.verdict, /\bok\b/);
     assert.deepEqual(r.leaks, []);
+    assert.deepEqual(r.problems, []);
     assert.match(r.text, /No problems found/);
+});
+
+// A statement exported from LibreOffice with embedded fonts, shaded rows and a
+// dark header row with white text. Three words were then covered with black
+// boxes in another tool: an account number, an employer and a landlord's name.
+test('finds exactly the covered words on a realistic bank statement', async () => {
+    const r = await check(path.join(ROOT, 'tests/fixtures/statement-fake-redacted.pdf'));
+    assert.match(r.verdict, /\bbad\b/);
+    assert.deepEqual(r.leaks.slice().sort(), ['31245678', 'ACME', 'PATEL']);
+    assert.deepEqual(r.problems, []);
 });
